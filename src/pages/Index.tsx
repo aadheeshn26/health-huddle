@@ -9,6 +9,8 @@ import { useAuth } from '@/hooks/useAuth';
 
 const Index = () => {
   const { user } = useAuth();
+  
+  console.log('Index page rendering, user:', user);
 
   return (
     <div className="min-h-screen health-gradient pb-20">
@@ -32,7 +34,6 @@ const Index = () => {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
           {/* Left Side - Streak and Daily Check-in */}
           <div className="lg:col-span-1 space-y-4">
-            {/* Streak and Daily Check-in row - now side by side in one row */}
             <div className="grid grid-cols-2 gap-4">
               <div className="bg-white/60 backdrop-blur-sm rounded-lg p-4 health-card-glow border border-health-primary/20 h-32 flex items-center justify-center">
                 <StreakCounter />
