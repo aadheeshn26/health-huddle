@@ -1,11 +1,13 @@
 
 import { useState, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 export const useImageUpload = () => {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [extractedText, setExtractedText] = useState<string>('');
   const { toast } = useToast();
 
   const handleImageUpload = useCallback((file: File) => {
@@ -61,27 +63,48 @@ export const useImageUpload = () => {
         reader.readAsDataURL(image);
       });
 
-      console.log('Image prepared for Google Vision API:', {
+      console.log('Processing image with Google Vision API:', {
         filename: image.name,
         size: image.size,
         type: image.type
       });
 
-      // TODO: Implement Google Vision API call
-      // This would typically be done through a Supabase Edge Function
-      // For now, we'll just prepare the data structure
+      // Call the Edge Function
+      const { data, error } = await supabase.functions.invoke('process-medical-image', {
+        body: {
+          image: base64Image,
+          mimeType: image.type
+        }
+      });
+
+      if (error) {
+        console.error('Edge function error:', error);
+        throw new Error(error.message || 'Failed to process image');
+      }
+
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to extract text from image');
+      }
+
+      console.log('Text extraction successful:', data.extractedText?.length || 0, 'characters');
+      
+      setExtractedText(data.extractedText || '');
+      
+      toast({
+        title: "Image processed!",
+        description: data.message || "Text extracted from medical image.",
+      });
       
       return {
-        image: base64Image,
-        mimeType: image.type,
-        filename: image.name
+        extractedText: data.extractedText || '',
+        success: true
       };
 
     } catch (error) {
       console.error('Error processing image:', error);
       toast({
         title: "Processing failed",
-        description: "Could not process the image. Please try again.",
+        description: error instanceof Error ? error.message : "Could not process the image. Please try again.",
         variant: "destructive",
       });
       return null;
@@ -93,11 +116,13 @@ export const useImageUpload = () => {
   const clearImage = useCallback(() => {
     setSelectedImage(null);
     setImagePreview(null);
+    setExtractedText('');
   }, []);
 
   return {
     selectedImage,
     imagePreview,
+    extractedText,
     isProcessing,
     handleImageUpload,
     processImageWithVision,

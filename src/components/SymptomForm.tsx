@@ -8,7 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useAudioRecorder } from '@/hooks/useAudioRecorder';
 import { useImageUpload } from '@/hooks/useImageUpload';
-import { Mic, MicOff, Loader2, Upload, X } from 'lucide-react';
+import { Mic, MicOff, Loader2, Upload, X, Eye } from 'lucide-react';
 
 const SymptomForm = () => {
   const { user } = useAuth();
@@ -26,12 +26,15 @@ const SymptomForm = () => {
   }, []);
 
   const { isRecording, isTranscribing, toggleRecording } = useAudioRecorder(handleTranscription);
-  const { selectedImage, imagePreview, isProcessing, handleImageUpload, clearImage } = useImageUpload();
+  const { selectedImage, imagePreview, extractedText, isProcessing, handleImageUpload, processImageWithVision, clearImage } = useImageUpload();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!symptoms.trim() && !selectedImage) {
+    // Combine symptoms text with extracted text from image
+    const combinedSymptoms = [symptoms.trim(), extractedText.trim()].filter(Boolean).join('\n\nExtracted from medical image:\n');
+    
+    if (!combinedSymptoms && !selectedImage) {
       toast({
         title: "Please add symptoms",
         description: "Enter your symptoms or upload an image to continue.",
@@ -62,7 +65,7 @@ const SymptomForm = () => {
         .from('symptoms')
         .insert({
           user_id: user.id,
-          text: symptoms,
+          text: combinedSymptoms,
           image_url: selectedImage ? `image_${Date.now()}_${selectedImage.name}` : null,
         });
 
@@ -78,7 +81,12 @@ const SymptomForm = () => {
 
       if (checkupError) throw checkupError;
 
-      console.log('Symptoms and daily checkup recorded:', { symptoms, image: selectedImage?.name, type: checkupType });
+      console.log('Symptoms and daily checkup recorded:', { 
+        symptoms: combinedSymptoms, 
+        image: selectedImage?.name, 
+        type: checkupType,
+        extractedTextLength: extractedText.length
+      });
       
       toast({
         title: "Symptoms recorded!",
@@ -107,10 +115,12 @@ const SymptomForm = () => {
     }
   };
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       handleImageUpload(file);
+      // Automatically process the image with Google Vision API
+      await processImageWithVision(file);
     }
   };
 
@@ -247,6 +257,18 @@ const SymptomForm = () => {
                 📎 {selectedImage?.name} ({Math.round((selectedImage?.size || 0) / 1024)}KB)
               </div>
             </div>
+            
+            {extractedText && (
+              <div className="mt-3 p-3 bg-green-50 rounded-lg border border-green-200">
+                <div className="flex items-center gap-2 mb-2">
+                  <Eye className="h-4 w-4 text-green-600" />
+                  <span className="text-sm font-medium text-green-800">Extracted Text:</span>
+                </div>
+                <p className="text-xs text-green-700 max-h-20 overflow-y-auto">
+                  {extractedText}
+                </p>
+              </div>
+            )}
           </div>
         )}
 
