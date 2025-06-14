@@ -32,7 +32,7 @@ const Index = () => {
 
         {/* Top Section - Streak and Daily Check-in */}
         <div className="max-w-7xl mx-auto mb-6">
-          <div className="grid grid-cols-2 gap-4 max-w-md mx-auto">
+          <div className="grid grid-cols-2 gap-4">
             <div className="bg-white/60 backdrop-blur-sm rounded-lg p-4 health-card-glow border border-health-primary/20 h-32 flex items-center justify-center">
               <StreakCounter />
             </div>
