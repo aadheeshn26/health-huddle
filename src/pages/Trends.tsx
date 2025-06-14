@@ -10,13 +10,21 @@ import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import Navigation from '@/components/Navigation';
 
+interface KeyMetrics {
+  dailyEntries?: Record<string, number>;
+  glucoseReadings?: Array<{ date: string; value: number }>;
+}
+
 interface AnalysisData {
-  key_metrics?: {
-    dailyEntries: Record<string, number>;
-    glucoseReadings: Array<{ date: string; value: number }>;
-  };
+  id?: string;
+  user_id?: string;
+  analysis_period?: number;
+  claude_patterns?: any;
+  vision_insights?: any;
   gpt_summary?: string;
-  claude_patterns?: string;
+  key_metrics?: any;
+  created_at?: string;
+  updated_at?: string;
 }
 
 const Trends = () => {
@@ -89,14 +97,29 @@ const Trends = () => {
   const prepareChartData = () => {
     if (!analysis?.key_metrics) return [];
 
-    const { dailyEntries, glucoseReadings } = analysis.key_metrics;
+    const keyMetrics = analysis.key_metrics as KeyMetrics;
+    const { dailyEntries, glucoseReadings } = keyMetrics;
+    
+    if (!dailyEntries) return [];
+    
     const dates = Object.keys(dailyEntries).sort();
 
     return dates.map(date => ({
       date: new Date(date).toLocaleDateString(),
       entries: dailyEntries[date] || 0,
-      glucose: glucoseReadings.find((g) => g.date === date)?.value || null
+      glucose: glucoseReadings?.find((g) => g.date === date)?.value || null
     }));
+  };
+
+  const getKeyMetricsStats = () => {
+    if (!analysis?.key_metrics) return { activeDays: 0, totalEntries: 0, glucoseReadings: 0 };
+    
+    const keyMetrics = analysis.key_metrics as KeyMetrics;
+    const activeDays = keyMetrics.dailyEntries ? Object.keys(keyMetrics.dailyEntries).length : 0;
+    const totalEntries = keyMetrics.dailyEntries ? Object.values(keyMetrics.dailyEntries).reduce((a: number, b: number) => a + b, 0) : 0;
+    const glucoseReadings = keyMetrics.glucoseReadings?.length || 0;
+    
+    return { activeDays, totalEntries, glucoseReadings };
   };
 
   if (!user) {
@@ -106,6 +129,8 @@ const Trends = () => {
       </div>
     );
   }
+
+  const { activeDays, totalEntries, glucoseReadings } = getKeyMetricsStats();
 
   return (
     <div className="min-h-screen bg-black text-white pb-20">
@@ -148,7 +173,7 @@ const Trends = () => {
                 <Calendar className="text-blue-400" size={20} />
                 <div>
                   <div className="text-2xl font-bold text-white">
-                    {analysis?.key_metrics ? Object.keys(analysis.key_metrics.dailyEntries || {}).length : 0}
+                    {activeDays}
                   </div>
                   <div className="text-sm text-gray-400">Active Days</div>
                 </div>
@@ -160,7 +185,7 @@ const Trends = () => {
                 <Activity className="text-green-400" size={20} />
                 <div>
                   <div className="text-2xl font-bold text-white">
-                    {analysis?.key_metrics ? Object.values(analysis.key_metrics.dailyEntries || {}).reduce((a: number, b: number) => a + b, 0) : 0}
+                    {totalEntries}
                   </div>
                   <div className="text-sm text-gray-400">Total Entries</div>
                 </div>
@@ -172,7 +197,7 @@ const Trends = () => {
                 <TrendingUp className="text-purple-400" size={20} />
                 <div>
                   <div className="text-2xl font-bold text-white">
-                    {analysis?.key_metrics?.glucoseReadings?.length || 0}
+                    {glucoseReadings}
                   </div>
                   <div className="text-sm text-gray-400">Glucose Readings</div>
                 </div>
