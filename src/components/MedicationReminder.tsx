@@ -147,7 +147,7 @@ const MedicationReminder = () => {
     });
   };
 
-  // Fixed medication filtering logic
+  // Filter medications based on selected date and frequency
   const getMedicationsForDate = () => {
     const selectedDay = selectedDate.getDay(); // 0 = Sunday, 1 = Monday, etc.
     const selectedDateNum = selectedDate.getDate(); // 1-31
@@ -197,11 +197,11 @@ const MedicationReminder = () => {
     });
   };
 
-  const dateMedications = getMedicationsForDate();
+  const filteredMedications = getMedicationsForDate();
 
   console.log('Current medications:', medications);
   console.log('Selected date:', selectedDate);
-  console.log('Medications for selected date:', dateMedications);
+  console.log('Filtered medications for selected date:', filteredMedications);
 
   const needsDaySelection = frequency === 'weekly' || frequency === 'bi-weekly';
   const needsMonthDaySelection = frequency === 'monthly';
@@ -332,7 +332,7 @@ const MedicationReminder = () => {
             </div>
           </div>
 
-          {/* Right Side - Calendar and Medications */}
+          {/* Right Side - Calendar and Filtered Medications */}
           <div className="lg:col-span-2 space-y-6">
             {/* Calendar and Medications in 2 columns */}
             <div className="grid grid-cols-2 gap-4">
@@ -369,13 +369,15 @@ const MedicationReminder = () => {
                 </div>
               </div>
 
-              {/* Your Medications List */}
+              {/* Medications for Selected Date */}
               <div className="h-80">
-                <h3 className="text-lg font-medium text-slate-800 mb-3">Your Medications</h3>
+                <h3 className="text-lg font-medium text-slate-800 mb-3">
+                  Medications for {format(selectedDate, 'MMM d, yyyy')}
+                </h3>
                 <div className="bg-white rounded-lg border border-health-primary/20 p-4 shadow-sm h-full">
-                  {medications.length > 0 ? (
+                  {filteredMedications.length > 0 ? (
                     <div className="space-y-3 h-full overflow-y-auto">
-                      {medications.map((med) => (
+                      {filteredMedications.map((med) => (
                         <div key={med.id} className="bg-health-lighter/50 rounded-lg p-3 border border-health-primary/10">
                           <div className="flex justify-between items-start">
                             <div className="flex-1">
@@ -417,42 +419,14 @@ const MedicationReminder = () => {
                   ) : (
                     <div className="flex items-center justify-center h-full text-health-muted text-center">
                       <div>
-                        <p className="text-lg mb-2">No medications added yet</p>
-                        <p className="text-sm">Add your first medication using the form on the left</p>
+                        <p className="text-lg mb-2">No medications for this date</p>
+                        <p className="text-sm">Medications will appear here based on their frequency and selected date</p>
                       </div>
                     </div>
                   )}
                 </div>
               </div>
             </div>
-
-            {/* Medications for Selected Date - Only show if there are medications for this date */}
-            {dateMedications.length > 0 && (
-              <div>
-                <h3 className="text-lg font-medium text-slate-800 mb-3">
-                  Medications for {format(selectedDate, 'MMMM d, yyyy')}
-                </h3>
-                <div className="bg-white rounded-lg border border-health-primary/20 p-4 shadow-sm">
-                  <div className="space-y-3">
-                    {dateMedications.map((med) => (
-                      <div key={med.id} className="bg-health-accent/20 rounded-lg p-3 border border-health-primary/20">
-                        <div className="flex justify-between items-center">
-                          <div>
-                            <div className="font-medium text-slate-800">{med.name}</div>
-                            <div className="text-sm text-health-muted">Take at {med.time}</div>
-                          </div>
-                          <div className="text-sm text-health-secondary font-medium">
-                            {frequencyOptions.find(f => f.value === med.frequency)?.label}
-                            {med.dayOfWeek !== undefined && ` - ${dayOptions.find(d => d.value === med.dayOfWeek)?.label}`}
-                            {med.dayOfMonth !== undefined && ` - Day ${med.dayOfMonth}`}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </Card>
