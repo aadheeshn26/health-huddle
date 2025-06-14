@@ -10,10 +10,19 @@ import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import Navigation from '@/components/Navigation';
 
+interface AnalysisData {
+  key_metrics?: {
+    dailyEntries: Record<string, number>;
+    glucoseReadings: Array<{ date: string; value: number }>;
+  };
+  gpt_summary?: string;
+  claude_patterns?: string;
+}
+
 const Trends = () => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const [analysis, setAnalysis] = useState<any>(null);
+  const [analysis, setAnalysis] = useState<AnalysisData | null>(null);
   const [loading, setLoading] = useState(false);
   const [period, setPeriod] = useState(30);
 
@@ -86,7 +95,7 @@ const Trends = () => {
     return dates.map(date => ({
       date: new Date(date).toLocaleDateString(),
       entries: dailyEntries[date] || 0,
-      glucose: glucoseReadings.find((g: any) => g.date === date)?.value || null
+      glucose: glucoseReadings.find((g) => g.date === date)?.value || null
     }));
   };
 
@@ -227,7 +236,10 @@ const Trends = () => {
             <Card className="bg-gray-900 border-gray-800 p-6">
               <h3 className="text-lg font-semibold text-white mb-4">Identified Patterns</h3>
               <div className="text-gray-300 leading-relaxed whitespace-pre-line">
-                {analysis.claude_patterns}
+                {typeof analysis.claude_patterns === 'string' 
+                  ? analysis.claude_patterns 
+                  : JSON.stringify(analysis.claude_patterns, null, 2)
+                }
               </div>
             </Card>
           )}
