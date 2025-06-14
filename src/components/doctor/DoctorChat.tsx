@@ -60,7 +60,16 @@ const DoctorChat = ({ doctor, onBack }: DoctorChatProps) => {
         .order('created_at', { ascending: true });
 
       if (error) throw error;
-      setMessages(data || []);
+      
+      // Transform the data to ensure sender_type is properly typed
+      const transformedMessages: ChatMessage[] = (data || []).map(msg => ({
+        id: msg.id,
+        message: msg.message,
+        sender_type: msg.sender_type as 'user' | 'doctor',
+        created_at: msg.created_at
+      }));
+      
+      setMessages(transformedMessages);
     } catch (error) {
       console.error('Error loading messages:', error);
       toast({
@@ -90,7 +99,15 @@ const DoctorChat = ({ doctor, onBack }: DoctorChatProps) => {
 
       if (error) throw error;
 
-      setMessages(prev => [...prev, data]);
+      // Transform the response data to match our ChatMessage interface
+      const newChatMessage: ChatMessage = {
+        id: data.id,
+        message: data.message,
+        sender_type: data.sender_type as 'user' | 'doctor',
+        created_at: data.created_at
+      };
+
+      setMessages(prev => [...prev, newChatMessage]);
       setNewMessage('');
     } catch (error) {
       console.error('Error sending message:', error);
