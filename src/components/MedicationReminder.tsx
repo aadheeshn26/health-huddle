@@ -91,8 +91,8 @@ const MedicationReminder = () => {
     });
   };
 
-  // Get today's medications based on frequency and selected date
-  const getTodaysMedications = () => {
+  // Get medications for selected date based on frequency
+  const getMedicationsForDate = () => {
     const today = new Date();
     const selectedDay = selectedDate.getDay();
     const selectedDateNum = selectedDate.getDate();
@@ -114,10 +114,11 @@ const MedicationReminder = () => {
     });
   };
 
-  const todaysMedications = getTodaysMedications();
+  const dateMedications = getMedicationsForDate();
 
   console.log('Current medications:', medications);
-  console.log('Todays medications:', todaysMedications);
+  console.log('Selected date:', selectedDate);
+  console.log('Medications for selected date:', dateMedications);
 
   return (
     <div className="w-full">
@@ -126,7 +127,7 @@ const MedicationReminder = () => {
           Medication Management
         </h2>
         
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Left Side - Medication List and Add Form */}
           <div className="space-y-6">
             {/* Current Medications List */}
@@ -248,30 +249,50 @@ const MedicationReminder = () => {
             </div>
           </div>
 
-          {/* Right Side - Calendar and Today's Schedule */}
+          {/* Right Side - Calendar and Medications for Selected Date */}
           <div className="space-y-6">
             {/* Calendar */}
             <div>
-              <h3 className="text-lg font-medium text-slate-800 mb-3">Calendar</h3>
-              <div className="bg-white/50 rounded-lg p-4 border border-health-primary/20">
+              <h3 className="text-lg font-medium text-slate-800 mb-3">Select Date</h3>
+              <div className="bg-white rounded-lg border border-health-primary/20 shadow-sm">
                 <Calendar
                   mode="single"
                   selected={selectedDate}
                   onSelect={(date) => date && setSelectedDate(date)}
-                  className="rounded-md border-0"
+                  className="p-4 pointer-events-auto rounded-lg"
+                  classNames={{
+                    months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
+                    month: "space-y-4",
+                    caption: "flex justify-center pt-1 relative items-center",
+                    caption_label: "text-sm font-medium text-slate-800",
+                    nav: "space-x-1 flex items-center",
+                    nav_button: "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 border border-health-primary/20 rounded",
+                    nav_button_previous: "absolute left-1",
+                    nav_button_next: "absolute right-1",
+                    table: "w-full border-collapse space-y-1",
+                    head_row: "flex",
+                    head_cell: "text-health-muted rounded-md w-9 font-normal text-sm",
+                    row: "flex w-full mt-2",
+                    cell: "h-9 w-9 text-center text-sm p-0 relative hover:bg-health-primary/10 rounded-md",
+                    day: "h-9 w-9 p-0 font-normal text-slate-800 hover:bg-health-primary/20 rounded-md",
+                    day_selected: "bg-health-primary text-white hover:bg-health-primary hover:text-white focus:bg-health-primary focus:text-white",
+                    day_today: "bg-health-accent/20 text-health-primary font-medium",
+                    day_outside: "text-health-muted opacity-50",
+                    day_disabled: "text-health-muted opacity-50",
+                  }}
                 />
               </div>
             </div>
 
-            {/* Today's Medications */}
+            {/* Medications for Selected Date */}
             <div>
               <h3 className="text-lg font-medium text-slate-800 mb-3">
                 Medications for {format(selectedDate, 'MMMM d, yyyy')}
               </h3>
-              <div className="bg-white/50 rounded-lg p-4 border border-health-primary/20 min-h-[200px]">
-                {todaysMedications.length > 0 ? (
+              <div className="bg-white rounded-lg border border-health-primary/20 p-4 min-h-[200px] shadow-sm">
+                {dateMedications.length > 0 ? (
                   <div className="space-y-3">
-                    {todaysMedications.map((med) => (
+                    {dateMedications.map((med) => (
                       <div key={med.id} className="flex items-center justify-between p-3 bg-health-primary/5 rounded-md border border-health-primary/10">
                         <div>
                           <div className="font-medium text-slate-800">{med.name}</div>
