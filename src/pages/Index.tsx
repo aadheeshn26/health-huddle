@@ -30,25 +30,22 @@ const Index = () => {
           )}
         </div>
 
-        {/* Main Content Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
-          {/* Left Side - Streak and Daily Check-in */}
-          <div className="lg:col-span-1 space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="bg-white/60 backdrop-blur-sm rounded-lg p-4 health-card-glow border border-health-primary/20 h-32 flex items-center justify-center">
-                <StreakCounter />
-              </div>
-              <div className="h-32">
-                <DailyCheckIn />
-              </div>
+        {/* Top Section - Streak and Daily Check-in */}
+        <div className="max-w-7xl mx-auto mb-6">
+          <div className="grid grid-cols-2 gap-4 max-w-md mx-auto">
+            <div className="bg-white/60 backdrop-blur-sm rounded-lg p-4 health-card-glow border border-health-primary/20 h-32 flex items-center justify-center">
+              <StreakCounter />
+            </div>
+            <div className="h-32">
+              <DailyCheckIn />
             </div>
           </div>
+        </div>
 
-          {/* Right Side - Symptom Form and Medication Reminder */}
-          <div className="lg:col-span-3 space-y-6">
-            <SymptomForm />
-            <MedicationReminder />
-          </div>
+        {/* Main Content Layout */}
+        <div className="max-w-7xl mx-auto space-y-6">
+          <SymptomForm />
+          <MedicationReminder />
         </div>
       </div>
 
