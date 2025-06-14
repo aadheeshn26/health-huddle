@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -127,60 +126,9 @@ const MedicationReminder = () => {
           Medication Management
         </h2>
         
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Left Side - Medication List and Add Form */}
-          <div className="space-y-6">
-            {/* Current Medications List */}
-            <div>
-              <h3 className="text-lg font-medium text-slate-800 mb-3">Your Medications</h3>
-              {medications.length > 0 ? (
-                <div className="space-y-3 max-h-60 overflow-y-auto">
-                  {medications.map((med) => (
-                    <div key={med.id} className="bg-health-lighter/50 rounded-lg p-3 border border-health-primary/10">
-                      <div className="flex justify-between items-start">
-                        <div className="flex-1">
-                          <div className="font-medium text-slate-800">{med.name}</div>
-                          <div className="text-sm text-health-muted">
-                            Time: {med.time}
-                          </div>
-                          <div className="text-sm text-health-muted">
-                            Frequency: {frequencyOptions.find(f => f.value === med.frequency)?.label}
-                          </div>
-                          <div className="text-xs text-health-muted mt-1">
-                            Notifications: {med.notifications ? 'Enabled' : 'Disabled'}
-                          </div>
-                        </div>
-                        <div className="flex gap-2">
-                          <Button
-                            onClick={() => handleEdit(med.id)}
-                            variant="outline"
-                            size="sm"
-                            className="text-xs border-health-primary/30 text-health-primary hover:bg-health-primary/10"
-                          >
-                            Edit
-                          </Button>
-                          <Button
-                            onClick={() => handleDelete(med.id)}
-                            variant="outline"
-                            size="sm"
-                            className="text-xs border-red-300 text-red-600 hover:bg-red-50"
-                          >
-                            Delete
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-8 text-health-muted">
-                  <p>No medications added yet</p>
-                  <p className="text-sm">Add your first medication below</p>
-                </div>
-              )}
-            </div>
-
-            {/* Add New Medication Form */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Left Side - Add Medication Form */}
+          <div className="lg:col-span-1 space-y-6">
             <div>
               <h3 className="text-lg font-medium text-slate-800 mb-3">Add Medication Reminder</h3>
               <form onSubmit={handleSave} className="space-y-4">
@@ -247,10 +195,7 @@ const MedicationReminder = () => {
                 </Button>
               </form>
             </div>
-          </div>
 
-          {/* Right Side - Calendar and Medications for Selected Date */}
-          <div className="space-y-6">
             {/* Calendar */}
             <div>
               <h3 className="text-lg font-medium text-slate-800 mb-3">Select Date</h3>
@@ -282,6 +227,59 @@ const MedicationReminder = () => {
                   }}
                 />
               </div>
+            </div>
+          </div>
+
+          {/* Right Side - Medications Lists */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Current Medications List */}
+            <div>
+              <h3 className="text-lg font-medium text-slate-800 mb-3">Your Medications</h3>
+              {medications.length > 0 ? (
+                <div className="space-y-3 max-h-60 overflow-y-auto">
+                  {medications.map((med) => (
+                    <div key={med.id} className="bg-health-lighter/50 rounded-lg p-3 border border-health-primary/10">
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                          <div className="font-medium text-slate-800">{med.name}</div>
+                          <div className="text-sm text-health-muted">
+                            Time: {med.time}
+                          </div>
+                          <div className="text-sm text-health-muted">
+                            Frequency: {frequencyOptions.find(f => f.value === med.frequency)?.label}
+                          </div>
+                          <div className="text-xs text-health-muted mt-1">
+                            Notifications: {med.notifications ? 'Enabled' : 'Disabled'}
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button
+                            onClick={() => handleEdit(med.id)}
+                            variant="outline"
+                            size="sm"
+                            className="text-xs border-health-primary/30 text-health-primary hover:bg-health-primary/10"
+                          >
+                            Edit
+                          </Button>
+                          <Button
+                            onClick={() => handleDelete(med.id)}
+                            variant="outline"
+                            size="sm"
+                            className="text-xs border-red-300 text-red-600 hover:bg-red-50"
+                          >
+                            Delete
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-health-muted">
+                  <p>No medications added yet</p>
+                  <p className="text-sm">Add your first medication using the form on the left</p>
+                </div>
+              )}
             </div>
 
             {/* Medications for Selected Date */}
