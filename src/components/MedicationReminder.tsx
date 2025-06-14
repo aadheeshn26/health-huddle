@@ -117,7 +117,6 @@ const MedicationReminder = () => {
 
   console.log('Current medications:', medications);
   console.log('Selected date:', selectedDate);
-  console.log('Medications for selected date:', dateMedications);
 
   return (
     <div className="w-full">
@@ -195,7 +194,10 @@ const MedicationReminder = () => {
                 </Button>
               </form>
             </div>
+          </div>
 
+          {/* Middle - Calendar and Medications List */}
+          <div className="lg:col-span-2 grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Calendar */}
             <div>
               <h3 className="text-lg font-medium text-slate-800 mb-3">Select Date</h3>
@@ -228,76 +230,46 @@ const MedicationReminder = () => {
                 />
               </div>
             </div>
-          </div>
 
-          {/* Right Side - Medications Lists */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Current Medications List */}
+            {/* Your Medications List */}
             <div>
               <h3 className="text-lg font-medium text-slate-800 mb-3">Your Medications</h3>
-              {medications.length > 0 ? (
-                <div className="space-y-3 max-h-60 overflow-y-auto">
-                  {medications.map((med) => (
-                    <div key={med.id} className="bg-health-lighter/50 rounded-lg p-3 border border-health-primary/10">
-                      <div className="flex justify-between items-start">
-                        <div className="flex-1">
-                          <div className="font-medium text-slate-800">{med.name}</div>
-                          <div className="text-sm text-health-muted">
-                            Time: {med.time}
+              <div className="bg-white rounded-lg border border-health-primary/20 p-4 shadow-sm min-h-[350px]">
+                {medications.length > 0 ? (
+                  <div className="space-y-3 max-h-80 overflow-y-auto">
+                    {medications.map((med) => (
+                      <div key={med.id} className="bg-health-lighter/50 rounded-lg p-3 border border-health-primary/10">
+                        <div className="flex justify-between items-start">
+                          <div className="flex-1">
+                            <div className="font-medium text-slate-800">{med.name}</div>
+                            <div className="text-sm text-health-muted">
+                              Time: {med.time}
+                            </div>
+                            <div className="text-sm text-health-muted">
+                              Frequency: {frequencyOptions.find(f => f.value === med.frequency)?.label}
+                            </div>
+                            <div className="text-xs text-health-muted mt-1">
+                              Notifications: {med.notifications ? 'Enabled' : 'Disabled'}
+                            </div>
                           </div>
-                          <div className="text-sm text-health-muted">
-                            Frequency: {frequencyOptions.find(f => f.value === med.frequency)?.label}
+                          <div className="flex gap-2">
+                            <Button
+                              onClick={() => handleEdit(med.id)}
+                              variant="outline"
+                              size="sm"
+                              className="text-xs border-health-primary/30 text-health-primary hover:bg-health-primary/10"
+                            >
+                              Edit
+                            </Button>
+                            <Button
+                              onClick={() => handleDelete(med.id)}
+                              variant="outline"
+                              size="sm"
+                              className="text-xs border-red-300 text-red-600 hover:bg-red-50"
+                            >
+                              Delete
+                            </Button>
                           </div>
-                          <div className="text-xs text-health-muted mt-1">
-                            Notifications: {med.notifications ? 'Enabled' : 'Disabled'}
-                          </div>
-                        </div>
-                        <div className="flex gap-2">
-                          <Button
-                            onClick={() => handleEdit(med.id)}
-                            variant="outline"
-                            size="sm"
-                            className="text-xs border-health-primary/30 text-health-primary hover:bg-health-primary/10"
-                          >
-                            Edit
-                          </Button>
-                          <Button
-                            onClick={() => handleDelete(med.id)}
-                            variant="outline"
-                            size="sm"
-                            className="text-xs border-red-300 text-red-600 hover:bg-red-50"
-                          >
-                            Delete
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-8 text-health-muted">
-                  <p>No medications added yet</p>
-                  <p className="text-sm">Add your first medication using the form on the left</p>
-                </div>
-              )}
-            </div>
-
-            {/* Medications for Selected Date */}
-            <div>
-              <h3 className="text-lg font-medium text-slate-800 mb-3">
-                Medications for {format(selectedDate, 'MMMM d, yyyy')}
-              </h3>
-              <div className="bg-white rounded-lg border border-health-primary/20 p-4 min-h-[200px] shadow-sm">
-                {dateMedications.length > 0 ? (
-                  <div className="space-y-3">
-                    {dateMedications.map((med) => (
-                      <div key={med.id} className="flex items-center justify-between p-3 bg-health-primary/5 rounded-md border border-health-primary/10">
-                        <div>
-                          <div className="font-medium text-slate-800">{med.name}</div>
-                          <div className="text-sm text-health-muted">Take at {med.time}</div>
-                        </div>
-                        <div className="text-xs px-2 py-1 bg-health-primary/10 rounded-full text-health-primary font-medium">
-                          {frequencyOptions.find(f => f.value === med.frequency)?.label}
                         </div>
                       </div>
                     ))}
@@ -305,8 +277,8 @@ const MedicationReminder = () => {
                 ) : (
                   <div className="flex items-center justify-center h-full text-health-muted text-center">
                     <div>
-                      <p className="text-lg mb-2">No medications scheduled</p>
-                      <p className="text-sm">for {format(selectedDate, 'MMMM d, yyyy')}</p>
+                      <p className="text-lg mb-2">No medications added yet</p>
+                      <p className="text-sm">Add your first medication using the form on the left</p>
                     </div>
                   </div>
                 )}
