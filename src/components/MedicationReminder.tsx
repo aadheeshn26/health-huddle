@@ -196,92 +196,95 @@ const MedicationReminder = () => {
             </div>
           </div>
 
-          {/* Middle - Calendar and Medications List */}
-          <div className="lg:col-span-2 grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Calendar */}
-            <div>
-              <h3 className="text-lg font-medium text-slate-800 mb-3">Select Date</h3>
-              <div className="bg-white rounded-lg border border-health-primary/20 shadow-sm">
-                <Calendar
-                  mode="single"
-                  selected={selectedDate}
-                  onSelect={(date) => date && setSelectedDate(date)}
-                  className="p-4 pointer-events-auto rounded-lg"
-                  classNames={{
-                    months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
-                    month: "space-y-4",
-                    caption: "flex justify-center pt-1 relative items-center",
-                    caption_label: "text-sm font-medium text-slate-800",
-                    nav: "space-x-1 flex items-center",
-                    nav_button: "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 border border-health-primary/20 rounded",
-                    nav_button_previous: "absolute left-1",
-                    nav_button_next: "absolute right-1",
-                    table: "w-full border-collapse space-y-1",
-                    head_row: "flex",
-                    head_cell: "text-health-muted rounded-md w-9 font-normal text-sm",
-                    row: "flex w-full mt-2",
-                    cell: "h-9 w-9 text-center text-sm p-0 relative hover:bg-health-primary/10 rounded-md",
-                    day: "h-9 w-9 p-0 font-normal text-slate-800 hover:bg-health-primary/20 rounded-md",
-                    day_selected: "bg-health-primary text-white hover:bg-health-primary hover:text-white focus:bg-health-primary focus:text-white",
-                    day_today: "bg-health-accent/20 text-health-primary font-medium",
-                    day_outside: "text-health-muted opacity-50",
-                    day_disabled: "text-health-muted opacity-50",
-                  }}
-                />
+          {/* Right Side - Calendar and Medications */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Calendar and Medications in 2 columns like streak and daily check-in */}
+            <div className="grid grid-cols-2 gap-4">
+              {/* Calendar */}
+              <div>
+                <h3 className="text-lg font-medium text-slate-800 mb-3">Select Date</h3>
+                <div className="bg-white rounded-lg border border-health-primary/20 shadow-sm">
+                  <Calendar
+                    mode="single"
+                    selected={selectedDate}
+                    onSelect={(date) => date && setSelectedDate(date)}
+                    className="p-4 pointer-events-auto rounded-lg"
+                    classNames={{
+                      months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
+                      month: "space-y-4",
+                      caption: "flex justify-center pt-1 relative items-center",
+                      caption_label: "text-sm font-medium text-slate-800",
+                      nav: "space-x-1 flex items-center",
+                      nav_button: "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 border border-health-primary/20 rounded",
+                      nav_button_previous: "absolute left-1",
+                      nav_button_next: "absolute right-1",
+                      table: "w-full border-collapse space-y-1",
+                      head_row: "flex",
+                      head_cell: "text-health-muted rounded-md w-9 font-normal text-sm",
+                      row: "flex w-full mt-2",
+                      cell: "h-9 w-9 text-center text-sm p-0 relative hover:bg-health-primary/10 rounded-md",
+                      day: "h-9 w-9 p-0 font-normal text-slate-800 hover:bg-health-primary/20 rounded-md",
+                      day_selected: "bg-health-primary text-white hover:bg-health-primary hover:text-white focus:bg-health-primary focus:text-white",
+                      day_today: "bg-health-accent/20 text-health-primary font-medium",
+                      day_outside: "text-health-muted opacity-50",
+                      day_disabled: "text-health-muted opacity-50",
+                    }}
+                  />
+                </div>
               </div>
-            </div>
 
-            {/* Your Medications List */}
-            <div>
-              <h3 className="text-lg font-medium text-slate-800 mb-3">Your Medications</h3>
-              <div className="bg-white rounded-lg border border-health-primary/20 p-4 shadow-sm min-h-[350px]">
-                {medications.length > 0 ? (
-                  <div className="space-y-3 max-h-80 overflow-y-auto">
-                    {medications.map((med) => (
-                      <div key={med.id} className="bg-health-lighter/50 rounded-lg p-3 border border-health-primary/10">
-                        <div className="flex justify-between items-start">
-                          <div className="flex-1">
-                            <div className="font-medium text-slate-800">{med.name}</div>
-                            <div className="text-sm text-health-muted">
-                              Time: {med.time}
+              {/* Your Medications List */}
+              <div>
+                <h3 className="text-lg font-medium text-slate-800 mb-3">Your Medications</h3>
+                <div className="bg-white rounded-lg border border-health-primary/20 p-4 shadow-sm min-h-[350px]">
+                  {medications.length > 0 ? (
+                    <div className="space-y-3 max-h-80 overflow-y-auto">
+                      {medications.map((med) => (
+                        <div key={med.id} className="bg-health-lighter/50 rounded-lg p-3 border border-health-primary/10">
+                          <div className="flex justify-between items-start">
+                            <div className="flex-1">
+                              <div className="font-medium text-slate-800">{med.name}</div>
+                              <div className="text-sm text-health-muted">
+                                Time: {med.time}
+                              </div>
+                              <div className="text-sm text-health-muted">
+                                Frequency: {frequencyOptions.find(f => f.value === med.frequency)?.label}
+                              </div>
+                              <div className="text-xs text-health-muted mt-1">
+                                Notifications: {med.notifications ? 'Enabled' : 'Disabled'}
+                              </div>
                             </div>
-                            <div className="text-sm text-health-muted">
-                              Frequency: {frequencyOptions.find(f => f.value === med.frequency)?.label}
+                            <div className="flex gap-2">
+                              <Button
+                                onClick={() => handleEdit(med.id)}
+                                variant="outline"
+                                size="sm"
+                                className="text-xs border-health-primary/30 text-health-primary hover:bg-health-primary/10"
+                              >
+                                Edit
+                              </Button>
+                              <Button
+                                onClick={() => handleDelete(med.id)}
+                                variant="outline"
+                                size="sm"
+                                className="text-xs border-red-300 text-red-600 hover:bg-red-50"
+                              >
+                                Delete
+                              </Button>
                             </div>
-                            <div className="text-xs text-health-muted mt-1">
-                              Notifications: {med.notifications ? 'Enabled' : 'Disabled'}
-                            </div>
-                          </div>
-                          <div className="flex gap-2">
-                            <Button
-                              onClick={() => handleEdit(med.id)}
-                              variant="outline"
-                              size="sm"
-                              className="text-xs border-health-primary/30 text-health-primary hover:bg-health-primary/10"
-                            >
-                              Edit
-                            </Button>
-                            <Button
-                              onClick={() => handleDelete(med.id)}
-                              variant="outline"
-                              size="sm"
-                              className="text-xs border-red-300 text-red-600 hover:bg-red-50"
-                            >
-                              Delete
-                            </Button>
                           </div>
                         </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="flex items-center justify-center h-full text-health-muted text-center">
-                    <div>
-                      <p className="text-lg mb-2">No medications added yet</p>
-                      <p className="text-sm">Add your first medication using the form on the left</p>
+                      ))}
                     </div>
-                  </div>
-                )}
+                  ) : (
+                    <div className="flex items-center justify-center h-full text-health-muted text-center">
+                      <div>
+                        <p className="text-lg mb-2">No medications added yet</p>
+                        <p className="text-sm">Add your first medication using the form on the left</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
