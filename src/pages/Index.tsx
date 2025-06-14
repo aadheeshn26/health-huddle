@@ -1,3 +1,4 @@
+
 import React from 'react';
 import Navigation from '@/components/Navigation';
 import StreakCounter from '@/components/StreakCounter';
@@ -29,25 +30,15 @@ const Index = () => {
 
         {/* Main Content Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
-          {/* Left Side - Streak, Check-in and Quick Stats */}
+          {/* Left Side - Streak and Daily Check-in */}
           <div className="lg:col-span-1 space-y-4">
             {/* Streak and Daily Check-in row */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="bg-white/60 backdrop-blur-sm rounded-lg p-3 health-card-glow border border-health-primary/20">
+            <div className="grid grid-cols-1 gap-4">
+              <div className="bg-white/60 backdrop-blur-sm rounded-lg p-4 health-card-glow border border-health-primary/20 aspect-square flex items-center justify-center">
                 <StreakCounter />
               </div>
-              <DailyCheckIn />
-            </div>
-            
-            {/* Quick Stats */}
-            <div className="grid grid-cols-2 lg:grid-cols-1 gap-4">
-              <div className="bg-white/60 backdrop-blur-sm rounded-lg p-4 text-center border border-health-primary/20 health-card-glow">
-                <div className="text-2xl font-bold text-health-primary">12</div>
-                <div className="text-sm text-health-muted">Entries</div>
-              </div>
-              <div className="bg-white/60 backdrop-blur-sm rounded-lg p-4 text-center border border-health-primary/20 health-card-glow">
-                <div className="text-2xl font-bold text-health-success">85%</div>
-                <div className="text-sm text-health-muted">Progress</div>
+              <div className="aspect-square">
+                <DailyCheckIn />
               </div>
             </div>
           </div>

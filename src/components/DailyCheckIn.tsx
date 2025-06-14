@@ -65,7 +65,7 @@ const DailyCheckIn = () => {
     const averageScore = (totalScore / questions.length).toFixed(1);
     
     return (
-      <div className="bg-white/60 backdrop-blur-sm rounded-lg p-4 health-card-glow border border-health-primary/20">
+      <div className="bg-white/60 backdrop-blur-sm rounded-lg p-4 health-card-glow border border-health-primary/20 h-full flex flex-col justify-center">
         <div className="flex items-center justify-center space-x-2 mb-2">
           <CheckCircle className="text-health-success" size={20} />
           <span className="text-2xl font-bold text-health-primary">{averageScore}</span>
@@ -74,14 +74,14 @@ const DailyCheckIn = () => {
           <div className="text-sm font-semibold text-slate-800 mb-1">
             Today's Score
           </div>
-          <div className="text-xs text-health-muted">
+          <div className="text-xs text-health-muted mb-3">
             Check-in complete!
           </div>
         </div>
         <Button
           onClick={handleStartCheckIn}
           variant="outline"
-          className="w-full mt-3 text-xs border-health-primary/30 text-health-primary hover:bg-health-primary/10"
+          className="w-full text-xs border-health-primary/30 text-health-primary hover:bg-health-primary/10"
         >
           New Check-in
         </Button>
@@ -91,7 +91,7 @@ const DailyCheckIn = () => {
 
   if (isCheckingIn) {
     return (
-      <Card className="p-4 bg-white/60 backdrop-blur-sm border-health-primary/20 health-card-glow">
+      <Card className="p-4 bg-white/60 backdrop-blur-sm border-health-primary/20 health-card-glow h-full flex flex-col">
         <div className="mb-4">
           <div className="text-xs text-health-muted mb-2">
             Question {currentQuestion + 1} of {questions.length}
@@ -101,7 +101,7 @@ const DailyCheckIn = () => {
           </h3>
         </div>
         
-        <RadioGroup onValueChange={handleAnswer} className="space-y-2">
+        <RadioGroup onValueChange={handleAnswer} className="space-y-2 flex-1">
           {options.map((option) => (
             <div key={option.value} className="flex items-center space-x-2">
               <RadioGroupItem value={option.value.toString()} id={`option-${option.value}`} />
@@ -116,7 +116,7 @@ const DailyCheckIn = () => {
   }
 
   return (
-    <div className="bg-white/60 backdrop-blur-sm rounded-lg p-4 health-card-glow border border-health-primary/20">
+    <div className="bg-white/60 backdrop-blur-sm rounded-lg p-4 health-card-glow border border-health-primary/20 h-full flex flex-col justify-center">
       <div className="text-center mb-3">
         <div className="text-sm font-semibold text-slate-800 mb-1">
           Daily Check-in
