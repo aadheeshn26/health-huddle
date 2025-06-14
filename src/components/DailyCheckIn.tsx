@@ -35,9 +35,12 @@ const DailyCheckIn = () => {
   ];
 
   useEffect(() => {
-    if (!user) return;
-
     const checkTodayStatus = async () => {
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+
       try {
         const today = new Date().toISOString().split('T')[0];
         const { data, error } = await supabase
@@ -47,14 +50,14 @@ const DailyCheckIn = () => {
           .gte('completed_at', `${today}T00:00:00`)
           .lt('completed_at', `${today}T23:59:59`);
 
-        if (error) throw error;
-
-        if (data && data.length > 0) {
+        if (error) {
+          console.error('Error checking today status:', error);
+        } else if (data && data.length > 0) {
           setHasCompletedToday(true);
           setIsCompleted(true);
         }
       } catch (error) {
-        console.error('Error checking today status:', error);
+        console.error('Error in checkTodayStatus:', error);
       } finally {
         setLoading(false);
       }
@@ -93,23 +96,30 @@ const DailyCheckIn = () => {
               type: 'text', // This is a wellness check-in
             });
 
-          if (error) throw error;
+          if (error) {
+            console.error('Error completing check-in:', error);
+            toast({
+              title: "Error",
+              description: "Failed to save check-in. Please try again.",
+              variant: "destructive",
+            });
+          } else {
+            setIsCompleted(true);
+            setIsCheckingIn(false);
+            setHasCompletedToday(true);
+            
+            toast({
+              title: "Check-in Complete!",
+              description: `Your wellness score: ${averageScore}/5. Streak updated!`,
+            });
 
-          setIsCompleted(true);
-          setIsCheckingIn(false);
-          setHasCompletedToday(true);
-          
-          toast({
-            title: "Check-in Complete!",
-            description: `Your wellness score: ${averageScore}/5. Streak updated!`,
-          });
+            console.log('Daily check-in completed:', { answers: newAnswers, score: averageScore });
 
-          console.log('Daily check-in completed:', { answers: newAnswers, score: averageScore });
-
-          // Refresh page to update streak
-          setTimeout(() => {
-            window.location.reload();
-          }, 1500);
+            // Refresh page to update streak
+            setTimeout(() => {
+              window.location.reload();
+            }, 1500);
+          }
         }
       } catch (error) {
         console.error('Error completing check-in:', error);

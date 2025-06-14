@@ -10,28 +10,39 @@ const StreakCounter = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!user) return;
-
     const fetchStreak = async () => {
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+
       try {
         // First try to get streak from database
-        const { data: streakData } = await supabase
+        const { data: streakData, error: streakError } = await supabase
           .from('streaks')
           .select('streak_count')
           .eq('user_id', user.id)
-          .single();
+          .maybeSingle();
 
-        if (streakData) {
+        if (streakError) {
+          console.error('Error fetching streak:', streakError);
+          setStreak(0);
+        } else if (streakData) {
           setStreak(streakData.streak_count);
         } else {
           // Calculate streak using the database function
-          const { data: calculatedStreak } = await supabase
+          const { data: calculatedStreak, error: calcError } = await supabase
             .rpc('calculate_user_streak', { user_uuid: user.id });
           
-          setStreak(calculatedStreak || 0);
+          if (calcError) {
+            console.error('Error calculating streak:', calcError);
+            setStreak(0);
+          } else {
+            setStreak(calculatedStreak || 0);
+          }
         }
       } catch (error) {
-        console.error('Error fetching streak:', error);
+        console.error('Error in fetchStreak:', error);
         setStreak(0);
       } finally {
         setLoading(false);
@@ -70,7 +81,7 @@ const StreakCounter = () => {
         <span className="text-xl font-bold text-health-primary">{streak}</span>
       </div>
       <div className="text-xs font-semibold text-slate-800 mb-1">
-        {streak === 1 ? 'Day Streak' : 'Day Streak'}
+        Day Streak
       </div>
       
       {badgeInfo ? (
