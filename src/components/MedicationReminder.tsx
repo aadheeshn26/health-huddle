@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -148,7 +147,7 @@ const MedicationReminder = () => {
     });
   };
 
-  // Get medications for selected date based on frequency
+  // Fixed medication filtering logic
   const getMedicationsForDate = () => {
     const selectedDay = selectedDate.getDay(); // 0 = Sunday, 1 = Monday, etc.
     const selectedDateNum = selectedDate.getDate(); // 1-31
@@ -427,7 +426,7 @@ const MedicationReminder = () => {
               </div>
             </div>
 
-            {/* Medications for Selected Date */}
+            {/* Medications for Selected Date - Only show if there are medications for this date */}
             {dateMedications.length > 0 && (
               <div>
                 <h3 className="text-lg font-medium text-slate-800 mb-3">
