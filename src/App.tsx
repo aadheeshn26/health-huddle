@@ -9,7 +9,6 @@ import { AuthProvider } from "@/hooks/useAuth";
 import DevAuth from "@/components/DevAuth";
 import Index from "./pages/Index";
 import Chat from "./pages/Chat";
-import Trends from "./pages/Trends";
 import Reports from "./pages/Reports";
 import MyDoctor from "./pages/MyDoctor";
 import NotFound from "./pages/NotFound";
@@ -27,7 +26,6 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/chat" element={<Chat />} />
-              <Route path="/trends" element={<Trends />} />
               <Route path="/reports" element={<Reports />} />
               <Route path="/my-doctor" element={<MyDoctor />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

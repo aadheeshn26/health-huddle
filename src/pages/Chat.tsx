@@ -19,7 +19,35 @@ const Chat = () => {
     { id: 'hypertension', name: 'Heart Health', members: 45 },
   ];
 
-  const { messages, loading, sendMessage } = useChatMessages(selectedGroup, user?.id);
+  // Mock messages for development since we don't have Supabase auth
+  const mockMessages = [
+    {
+      id: '1',
+      user_id: 'other-user-1',
+      message: 'Hello everyone! How is everyone feeling today?',
+      created_at: new Date(Date.now() - 3600000).toISOString(),
+      user_email: 'sarah@example.com'
+    },
+    {
+      id: '2',
+      user_id: user?.id || 'dev-user-123',
+      message: 'Hi Sarah! I\'m doing well, thanks for asking.',
+      created_at: new Date(Date.now() - 1800000).toISOString(),
+      user_email: user?.email
+    },
+    {
+      id: '3',
+      user_id: 'other-user-2',
+      message: 'Great to see everyone here supporting each other!',
+      created_at: new Date(Date.now() - 900000).toISOString(),
+      user_email: 'mike@example.com'
+    }
+  ];
+
+  const sendMessage = async (message: string) => {
+    console.log('Sending message:', message);
+    // Mock implementation for development
+  };
 
   const handleGroupChange = (groupId: string) => {
     setSelectedGroup(groupId);
@@ -27,7 +55,7 @@ const Chat = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-white text-center">
           <h2 className="text-xl font-bold mb-2">Authentication Required</h2>
           <p>Please log in to access the chat feature.</p>
@@ -37,19 +65,21 @@ const Chat = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-900 pb-20">
-      <div className="max-w-md mx-auto">
+    <div className="min-h-screen bg-black text-white pb-20">
+      <div className="max-w-4xl mx-auto h-screen flex flex-col">
         <ChatHeader 
           groups={groups}
           selectedGroup={selectedGroup}
           onGroupChange={handleGroupChange}
         />
         
-        <MessagesList 
-          messages={messages}
-          loading={loading}
-          currentUserId={user.id}
-        />
+        <div className="flex-1 overflow-hidden">
+          <MessagesList 
+            messages={mockMessages}
+            loading={false}
+            currentUserId={user.id}
+          />
+        </div>
         
         <MessageInput onSendMessage={sendMessage} />
       </div>
