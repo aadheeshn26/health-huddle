@@ -4,7 +4,6 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ArrowLeft, Send } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 
@@ -52,24 +51,29 @@ const DoctorChat = ({ doctor, onBack }: DoctorChatProps) => {
 
   const loadMessages = async () => {
     try {
-      const { data, error } = await supabase
-        .from('doctor_chats')
-        .select('*')
-        .eq('doctor_id', doctor.id)
-        .eq('user_id', user?.id)
-        .order('created_at', { ascending: true });
-
-      if (error) throw error;
+      // Mock messages for development
+      const mockMessages: ChatMessage[] = [
+        {
+          id: '1',
+          message: 'Hello! How are you feeling today?',
+          sender_type: 'doctor',
+          created_at: new Date(Date.now() - 3600000).toISOString()
+        },
+        {
+          id: '2',
+          message: 'Hi Dr. Johnson, I\'ve been experiencing some mild headaches.',
+          sender_type: 'user',
+          created_at: new Date(Date.now() - 1800000).toISOString()
+        },
+        {
+          id: '3',
+          message: 'I see. How long have you been experiencing these headaches? Any other symptoms?',
+          sender_type: 'doctor',
+          created_at: new Date(Date.now() - 900000).toISOString()
+        }
+      ];
       
-      // Transform the data to ensure sender_type is properly typed
-      const transformedMessages: ChatMessage[] = (data || []).map(msg => ({
-        id: msg.id,
-        message: msg.message,
-        sender_type: msg.sender_type as 'user' | 'doctor',
-        created_at: msg.created_at
-      }));
-      
-      setMessages(transformedMessages);
+      setMessages(mockMessages);
     } catch (error) {
       console.error('Error loading messages:', error);
       toast({
@@ -86,29 +90,28 @@ const DoctorChat = ({ doctor, onBack }: DoctorChatProps) => {
 
     setLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('doctor_chats')
-        .insert({
-          user_id: user.id,
-          doctor_id: doctor.id,
-          message: newMessage.trim(),
-          sender_type: 'user'
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      // Transform the response data to match our ChatMessage interface
+      // Mock sending message - in development we'll just add it to the local state
       const newChatMessage: ChatMessage = {
-        id: data.id,
-        message: data.message,
-        sender_type: data.sender_type as 'user' | 'doctor',
-        created_at: data.created_at
+        id: Date.now().toString(),
+        message: newMessage.trim(),
+        sender_type: 'user',
+        created_at: new Date().toISOString()
       };
 
       setMessages(prev => [...prev, newChatMessage]);
       setNewMessage('');
+      
+      // Mock doctor response after a delay
+      setTimeout(() => {
+        const doctorResponse: ChatMessage = {
+          id: (Date.now() + 1).toString(),
+          message: 'Thank you for sharing that information. I\'ll review your symptoms and get back to you shortly.',
+          sender_type: 'doctor',
+          created_at: new Date().toISOString()
+        };
+        setMessages(prev => [...prev, doctorResponse]);
+      }, 2000);
+      
     } catch (error) {
       console.error('Error sending message:', error);
       toast({

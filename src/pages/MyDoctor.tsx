@@ -34,18 +34,19 @@ const MyDoctor = () => {
 
   const loadDoctor = async () => {
     try {
-      const { data, error } = await supabase
-        .from('doctors')
-        .select('*')
-        .eq('user_id', user?.id)
-        .maybeSingle();
-
-      if (error) throw error;
+      // For development, we'll use a mock approach since we don't have real auth
+      // In a real app, this would query the database with the user ID
+      const mockDoctor = {
+        id: 'mock-doctor-123',
+        name: 'Dr. Sarah Johnson',
+        email: 'dr.johnson@healthcenter.com',
+        phone: '+1 (555) 123-4567',
+        location: 'San Francisco, CA',
+        profile_picture_url: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=200&h=200&fit=crop&crop=face',
+        specialization: 'Family Medicine'
+      };
       
-      setDoctor(data);
-      if (!data) {
-        setShowForm(true);
-      }
+      setDoctor(mockDoctor);
     } catch (error) {
       console.error('Error loading doctor:', error);
       toast({
@@ -66,14 +67,6 @@ const MyDoctor = () => {
       description: "Doctor information saved successfully.",
     });
   };
-
-  if (!user) {
-    return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="text-blue-400">Please log in to access your doctor.</div>
-      </div>
-    );
-  }
 
   if (loading) {
     return (
@@ -118,6 +111,12 @@ const MyDoctor = () => {
           ) : (
             <div className="text-center py-12">
               <p className="text-gray-400 mb-4">No doctor configured yet.</p>
+              <button
+                onClick={() => setShowForm(true)}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg"
+              >
+                Add Doctor
+              </button>
             </div>
           )}
         </div>
