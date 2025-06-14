@@ -198,12 +198,12 @@ const MedicationReminder = () => {
 
           {/* Right Side - Calendar and Medications */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Calendar and Medications in 2 columns like streak and daily check-in */}
+            {/* Calendar and Medications in 2 columns */}
             <div className="grid grid-cols-2 gap-4">
               {/* Calendar */}
-              <div>
-                <h3 className="text-lg font-medium text-slate-800 mb-3">Select Date</h3>
-                <div className="bg-white rounded-lg border border-health-primary/20 shadow-sm">
+              <div className="h-80">
+                <h3 className="text-lg font-medium text-slate-800 mb-3 text-center">Select Date</h3>
+                <div className="bg-white rounded-lg border border-health-primary/20 shadow-sm h-full flex items-center justify-center">
                   <Calendar
                     mode="single"
                     selected={selectedDate}
@@ -234,11 +234,11 @@ const MedicationReminder = () => {
               </div>
 
               {/* Your Medications List */}
-              <div>
+              <div className="h-80">
                 <h3 className="text-lg font-medium text-slate-800 mb-3">Your Medications</h3>
-                <div className="bg-white rounded-lg border border-health-primary/20 p-4 shadow-sm min-h-[350px]">
+                <div className="bg-white rounded-lg border border-health-primary/20 p-4 shadow-sm h-full">
                   {medications.length > 0 ? (
-                    <div className="space-y-3 max-h-80 overflow-y-auto">
+                    <div className="space-y-3 h-full overflow-y-auto">
                       {medications.map((med) => (
                         <div key={med.id} className="bg-health-lighter/50 rounded-lg p-3 border border-health-primary/10">
                           <div className="flex justify-between items-start">
