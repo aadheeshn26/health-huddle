@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from 'react';
+import { Flame } from 'lucide-react';
 
 const StreakCounter = () => {
   const [streak, setStreak] = useState(0);
@@ -50,30 +51,31 @@ const StreakCounter = () => {
   }, []);
 
   return (
-    <div className="bg-health-darker/50 rounded-xl p-6 health-card-glow border border-health-primary/20">
+    <div className="bg-health-darker/50 rounded-lg p-4 health-card-glow border border-health-primary/20">
+      <div className="flex items-center justify-center space-x-2 mb-2">
+        <Flame className="text-orange-500" size={20} />
+        <span className="text-2xl font-bold text-health-primary">{streak}</span>
+      </div>
       <div className="text-center">
-        <div className="text-4xl font-bold text-health-primary mb-2 animate-pulse-glow">
-          {streak}
-        </div>
-        <div className="text-lg font-semibold text-white mb-1">
+        <div className="text-sm font-semibold text-white mb-1">
           Day Streak
         </div>
-        <div className="text-sm text-gray-400">
-          Keep it up! Daily check-ins matter.
+        <div className="text-xs text-gray-400">
+          Keep it up!
         </div>
       </div>
-      <div className="mt-4 flex justify-center">
+      <div className="mt-3 flex justify-center">
         <div className="flex space-x-1">
-          {[...Array(Math.min(streak, 7))].map((_, i) => (
+          {[...Array(Math.min(streak, 5))].map((_, i) => (
             <div
               key={i}
-              className="w-3 h-3 rounded-full bg-health-primary animate-pulse"
+              className="w-2 h-2 rounded-full bg-health-primary"
               style={{ animationDelay: `${i * 0.1}s` }}
             />
           ))}
-          {streak > 7 && (
-            <div className="text-health-primary text-sm font-bold ml-2">
-              +{streak - 7}
+          {streak > 5 && (
+            <div className="text-health-primary text-xs font-bold ml-1">
+              +{streak - 5}
             </div>
           )}
         </div>
