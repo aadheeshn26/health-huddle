@@ -63,11 +63,16 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				'health-primary': '#3B82F6',
-				'health-secondary': '#60A5FA',
-				'health-dark': '#000000',
-				'health-darker': '#111827',
-				'health-accent': '#1E40AF'
+				// Health-focused color palette - soft blues, greens and neutrals
+				'health-primary': '#0d9488', // Teal-600
+				'health-secondary': '#14b8a6', // Teal-500
+				'health-accent': '#06b6d4', // Cyan-500
+				'health-muted': '#64748b', // Slate-500
+				'health-light': '#f1f5f9', // Slate-100
+				'health-lighter': '#f8fafc', // Slate-50
+				'health-success': '#10b981', // Emerald-500
+				'health-warning': '#f59e0b', // Amber-500
+				'health-info': '#3b82f6' // Blue-500
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
@@ -93,10 +98,10 @@ export default {
 				},
 				'pulse-glow': {
 					'0%, 100%': {
-						boxShadow: '0 0 5px #3B82F6'
+						boxShadow: '0 0 5px #0d9488'
 					},
 					'50%': {
-						boxShadow: '0 0 20px #60A5FA'
+						boxShadow: '0 0 20px #14b8a6'
 					}
 				}
 			},

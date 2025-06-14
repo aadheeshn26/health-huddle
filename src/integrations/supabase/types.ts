@@ -9,7 +9,123 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      chat_messages: {
+        Row: {
+          created_at: string
+          group_id: string | null
+          id: string
+          message: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          group_id?: string | null
+          id?: string
+          message: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          group_id?: string | null
+          id?: string
+          message?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          condition: Database["public"]["Enums"]["health_condition"] | null
+          created_at: string
+          email: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          condition?: Database["public"]["Enums"]["health_condition"] | null
+          created_at?: string
+          email?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          condition?: Database["public"]["Enums"]["health_condition"] | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      streaks: {
+        Row: {
+          id: string
+          last_login: string
+          streak_count: number
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          last_login?: string
+          streak_count?: number
+          user_id: string
+        }
+        Update: {
+          id?: string
+          last_login?: string
+          streak_count?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      support_points: {
+        Row: {
+          id: string
+          last_updated: string
+          points: number
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          last_updated?: string
+          points?: number
+          user_id: string
+        }
+        Update: {
+          id?: string
+          last_updated?: string
+          points?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      symptoms: {
+        Row: {
+          created_at: string
+          id: string
+          image_url: string | null
+          text: string | null
+          user_id: string
+          voice_transcript: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          text?: string | null
+          user_id: string
+          voice_transcript?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          text?: string | null
+          user_id?: string
+          voice_transcript?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -18,7 +134,15 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      health_condition:
+        | "diabetes"
+        | "hypertension"
+        | "heart_disease"
+        | "asthma"
+        | "arthritis"
+        | "depression"
+        | "anxiety"
+        | "other"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -133,6 +257,17 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      health_condition: [
+        "diabetes",
+        "hypertension",
+        "heart_disease",
+        "asthma",
+        "arthritis",
+        "depression",
+        "anxiety",
+        "other",
+      ],
+    },
   },
 } as const

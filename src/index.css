@@ -54,39 +54,39 @@
   }
 
   body {
-    @apply bg-health-dark text-white min-h-screen;
+    @apply bg-slate-50 text-slate-800 min-h-screen;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
   }
 
-  /* Custom scrollbar for dark theme */
+  /* Custom scrollbar for light theme */
   ::-webkit-scrollbar {
     width: 8px;
   }
 
   ::-webkit-scrollbar-track {
-    background: #111827;
+    background: #f1f5f9;
   }
 
   ::-webkit-scrollbar-thumb {
-    background: #3B82F6;
+    background: #0d9488;
     border-radius: 4px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: #60A5FA;
+    background: #14b8a6;
   }
 }
 
-/* Health app specific styles */
+/* Health app specific styles - soft blues, greens and neutrals */
 .health-gradient {
-  background: linear-gradient(135deg, #000000 0%, #111827 50%, #1E40AF 100%);
+  background: linear-gradient(135deg, #f8fafc 0%, #e0f2fe 50%, #ecfdf5 100%);
 }
 
 .health-card-glow {
-  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.1);
+  box-shadow: 0 4px 20px rgba(13, 148, 136, 0.1);
   transition: box-shadow 0.3s ease;
 }
 
 .health-card-glow:hover {
-  box-shadow: 0 8px 30px rgba(59, 130, 246, 0.2);
+  box-shadow: 0 8px 30px rgba(13, 148, 136, 0.15);
 }

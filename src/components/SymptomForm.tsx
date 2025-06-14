@@ -78,14 +78,14 @@ const SymptomForm = () => {
   };
 
   return (
-    <Card className="p-6 bg-health-darker/50 border-health-primary/20 health-card-glow">
-      <h2 className="text-xl font-semibold text-white mb-4">
+    <Card className="p-6 bg-white/60 backdrop-blur-sm border-health-primary/20 health-card-glow">
+      <h2 className="text-xl font-semibold text-slate-800 mb-4">
         Track Your Symptoms
       </h2>
       
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label htmlFor="symptoms" className="block text-sm font-medium text-gray-300 mb-2">
+          <label htmlFor="symptoms" className="block text-sm font-medium text-slate-700 mb-2">
             Describe your symptoms
           </label>
           <Textarea
@@ -93,7 +93,7 @@ const SymptomForm = () => {
             value={symptoms}
             onChange={(e) => setSymptoms(e.target.value)}
             placeholder="How are you feeling today? Describe any symptoms, pain levels, or changes you've noticed..."
-            className="min-h-[120px] bg-health-dark/50 border-health-primary/30 text-white placeholder-gray-400 focus:border-health-primary focus:ring-health-primary"
+            className="min-h-[120px] bg-white/50 border-health-primary/30 text-slate-800 placeholder-slate-500 focus:border-health-primary focus:ring-health-primary"
           />
         </div>
 
@@ -102,8 +102,8 @@ const SymptomForm = () => {
             type="button"
             onClick={handleVoiceRecord}
             variant="outline"
-            className={`flex-1 border-health-primary/30 text-white hover:bg-health-primary/10 ${
-              isRecording ? 'bg-red-600/20 border-red-500 animate-pulse' : ''
+            className={`flex-1 border-health-primary/30 text-health-primary hover:bg-health-primary/10 ${
+              isRecording ? 'bg-red-100 border-red-300 animate-pulse' : ''
             }`}
           >
             🎤 {isRecording ? 'Recording...' : 'Voice Record'}
@@ -113,7 +113,7 @@ const SymptomForm = () => {
             type="button"
             onClick={() => fileInputRef.current?.click()}
             variant="outline"
-            className="flex-1 border-health-primary/30 text-white hover:bg-health-primary/10"
+            className="flex-1 border-health-primary/30 text-health-primary hover:bg-health-primary/10"
           >
             📷 Upload Image
           </Button>
@@ -135,7 +135,7 @@ const SymptomForm = () => {
 
         <Button
           type="submit"
-          className="w-full bg-health-primary hover:bg-health-accent text-white font-semibold py-3"
+          className="w-full bg-health-primary hover:bg-health-secondary text-white font-semibold py-3"
         >
           Save Symptoms
         </Button>

@@ -51,16 +51,16 @@ const StreakCounter = () => {
   }, []);
 
   return (
-    <div className="bg-health-darker/50 rounded-lg p-4 health-card-glow border border-health-primary/20">
+    <div className="bg-white/60 backdrop-blur-sm rounded-lg p-4 health-card-glow border border-health-primary/20">
       <div className="flex items-center justify-center space-x-2 mb-2">
         <Flame className="text-orange-500" size={20} />
         <span className="text-2xl font-bold text-health-primary">{streak}</span>
       </div>
       <div className="text-center">
-        <div className="text-sm font-semibold text-white mb-1">
+        <div className="text-sm font-semibold text-slate-800 mb-1">
           Day Streak
         </div>
-        <div className="text-xs text-gray-400">
+        <div className="text-xs text-health-muted">
           Keep it up!
         </div>
       </div>

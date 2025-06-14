@@ -11,7 +11,7 @@ const Navigation = () => {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-health-darker/95 backdrop-blur-lg border-t border-health-primary/20 z-50">
+    <nav className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-lg border-t border-health-primary/20 z-50">
       <div className="max-w-md mx-auto px-4">
         <div className="flex justify-around items-center py-3">
           {navItems.map(({ path, icon: Icon, label }) => (
@@ -21,7 +21,7 @@ const Navigation = () => {
               className={`flex flex-col items-center space-y-1 px-4 py-2 rounded-lg transition-all ${
                 location.pathname === path
                   ? 'text-health-primary bg-health-primary/10'
-                  : 'text-gray-400 hover:text-health-secondary'
+                  : 'text-health-muted hover:text-health-secondary'
               }`}
             >
               <Icon size={24} />
