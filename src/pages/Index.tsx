@@ -1,4 +1,5 @@
 
+import React from 'react';
 import Navigation from '@/components/Navigation';
 import StreakCounter from '@/components/StreakCounter';
 import SymptomForm from '@/components/SymptomForm';
