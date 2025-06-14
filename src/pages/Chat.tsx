@@ -15,9 +15,7 @@ interface Message {
   created_at: string;
   is_flagged?: boolean;
   flagged_reason?: string;
-  profiles?: {
-    email?: string;
-  };
+  user_email?: string;
 }
 
 const Chat = () => {
@@ -75,19 +73,35 @@ const Chat = () => {
     if (!user) return;
 
     try {
-      const { data, error } = await supabase
+      // First fetch messages
+      const { data: messagesData, error: messagesError } = await supabase
         .from('chat_messages')
-        .select(`
-          *,
-          profiles!inner(email)
-        `)
+        .select('*')
         .eq('group_id', selectedGroup)
         .eq('is_flagged', false)
         .order('created_at', { ascending: true })
         .limit(50);
 
-      if (error) throw error;
-      setMessages(data || []);
+      if (messagesError) throw messagesError;
+
+      // Then fetch user emails for these messages
+      const userIds = [...new Set(messagesData?.map(msg => msg.user_id) || [])];
+      const { data: profilesData, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, email')
+        .in('id', userIds);
+
+      if (profilesError) {
+        console.error('Error fetching profiles:', profilesError);
+      }
+
+      // Combine the data
+      const messagesWithEmails = messagesData?.map(msg => ({
+        ...msg,
+        user_email: profilesData?.find(profile => profile.id === msg.user_id)?.email
+      })) || [];
+
+      setMessages(messagesWithEmails);
     } catch (error) {
       console.error('Error fetching messages:', error);
       toast({
@@ -141,7 +155,7 @@ const Chat = () => {
 
   const getUserDisplayName = (msg: Message) => {
     if (msg.user_id === user?.id) return 'You';
-    return msg.profiles?.email?.split('@')[0] || 'Unknown User';
+    return msg.user_email?.split('@')[0] || 'Unknown User';
   };
 
   if (!user) {
