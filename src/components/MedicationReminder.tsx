@@ -123,21 +123,27 @@ const MedicationReminder = () => {
   const getMedicationsForDate = () => {
     const selectedDay = selectedDate.getDay(); // 0 = Sunday, 1 = Monday, etc.
     const today = new Date();
-    const selectedDateNum = selectedDate.getDate();
     
     return medications.filter(med => {
       switch (med.frequency) {
         case 'daily':
           return true;
         case 'weekly':
+          // Only show if the selected date's day of week matches the medication's day
           return med.dayOfWeek === selectedDay;
         case 'bi-weekly':
-          // Calculate if the selected date falls on the correct bi-weekly cycle
-          const daysDiff = Math.floor((selectedDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+          // For bi-weekly, check if it's the right day AND the right week cycle
+          if (med.dayOfWeek !== selectedDay) {
+            return false;
+          }
+          // Calculate weeks difference from today
+          const timeDiff = selectedDate.getTime() - today.getTime();
+          const daysDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
           const weeksDiff = Math.floor(daysDiff / 7);
-          return med.dayOfWeek === selectedDay && weeksDiff % 2 === 0;
+          return weeksDiff % 2 === 0;
         case 'monthly':
-          return selectedDateNum === today.getDate();
+          // For monthly, check if it's the same day of the month as today
+          return selectedDate.getDate() === today.getDate();
         default:
           return false;
       }
