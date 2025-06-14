@@ -1,8 +1,9 @@
-
 import React from 'react';
 import Navigation from '@/components/Navigation';
 import StreakCounter from '@/components/StreakCounter';
 import SymptomForm from '@/components/SymptomForm';
+import DailyCheckIn from '@/components/DailyCheckIn';
+import MedicationReminder from '@/components/MedicationReminder';
 import { useAuth } from '@/hooks/useAuth';
 
 const Index = () => {
@@ -28,9 +29,15 @@ const Index = () => {
 
         {/* Main Content Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
-          {/* Left Side - Streak and Quick Stats */}
+          {/* Left Side - Streak, Check-in and Quick Stats */}
           <div className="lg:col-span-1 space-y-4">
-            <StreakCounter />
+            {/* Streak and Daily Check-in row */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="bg-white/60 backdrop-blur-sm rounded-lg p-3 health-card-glow border border-health-primary/20">
+                <StreakCounter />
+              </div>
+              <DailyCheckIn />
+            </div>
             
             {/* Quick Stats */}
             <div className="grid grid-cols-2 lg:grid-cols-1 gap-4">
@@ -45,9 +52,10 @@ const Index = () => {
             </div>
           </div>
 
-          {/* Right Side - Symptom Form */}
-          <div className="lg:col-span-3">
+          {/* Right Side - Symptom Form and Medication Reminder */}
+          <div className="lg:col-span-3 space-y-6">
             <SymptomForm />
+            <MedicationReminder />
           </div>
         </div>
       </div>

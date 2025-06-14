@@ -1,4 +1,3 @@
-
 import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -102,8 +101,8 @@ const SymptomForm = () => {
             type="button"
             onClick={handleVoiceRecord}
             variant="outline"
-            className={`flex-1 border-health-primary/30 text-health-primary hover:bg-health-primary/10 ${
-              isRecording ? 'bg-red-100 border-red-300 animate-pulse' : ''
+            className={`flex-1 bg-transparent border-health-primary text-health-primary hover:bg-health-primary/10 ${
+              isRecording ? 'bg-red-100/50 border-red-300 animate-pulse' : ''
             }`}
           >
             🎤 {isRecording ? 'Recording...' : 'Voice Record'}
@@ -113,7 +112,7 @@ const SymptomForm = () => {
             type="button"
             onClick={() => fileInputRef.current?.click()}
             variant="outline"
-            className="flex-1 border-health-primary/30 text-health-primary hover:bg-health-primary/10"
+            className="flex-1 bg-transparent border-health-primary text-health-primary hover:bg-health-primary/10"
           >
             📷 Upload Image
           </Button>
