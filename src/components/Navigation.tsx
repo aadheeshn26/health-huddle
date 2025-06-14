@@ -1,6 +1,6 @@
 
 import { Link, useLocation } from 'react-router-dom';
-import { Home, MessageSquare, TrendingUp, FileText } from 'lucide-react';
+import { Home, MessageSquare, TrendingUp, FileText, User } from 'lucide-react';
 
 const Navigation = () => {
   const location = useLocation();
@@ -10,6 +10,7 @@ const Navigation = () => {
     { path: '/chat', icon: MessageSquare, label: 'Chat' },
     { path: '/trends', icon: TrendingUp, label: 'Trends' },
     { path: '/reports', icon: FileText, label: 'Reports' },
+    { path: '/my-doctor', icon: User, label: 'Doctor' },
   ];
 
   return (
