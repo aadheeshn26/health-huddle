@@ -1,11 +1,17 @@
-
 import { useState } from 'react';
 import Navigation from '@/components/Navigation';
 import { useAuth } from '@/hooks/useAuth';
 import ChatHeader from '@/components/chat/ChatHeader';
 import MessagesList from '@/components/chat/MessagesList';
 import MessageInput from '@/components/chat/MessageInput';
-import { useChatMessages } from '@/components/chat/useChatMessages';
+
+interface Message {
+  id: string;
+  user_id: string;
+  message: string;
+  created_at: string;
+  user_email?: string;
+}
 
 const Chat = () => {
   const { user } = useAuth();
@@ -19,8 +25,8 @@ const Chat = () => {
     { id: 'hypertension', name: 'Heart Health', members: 45 },
   ];
 
-  // Mock messages for development since we don't have Supabase auth
-  const mockMessages = [
+  // Initial mock messages
+  const initialMessages: Message[] = [
     {
       id: '1',
       user_id: 'other-user-1',
@@ -44,13 +50,28 @@ const Chat = () => {
     }
   ];
 
+  const [messages, setMessages] = useState<Message[]>(initialMessages);
+
   const sendMessage = async (message: string) => {
     console.log('Sending message:', message);
-    // Mock implementation for development
+    
+    // Create new message object
+    const newMessage: Message = {
+      id: Date.now().toString(), // Simple ID generation for demo
+      user_id: user?.id || 'dev-user-123',
+      message: message,
+      created_at: new Date().toISOString(),
+      user_email: user?.email
+    };
+
+    // Add message to local state
+    setMessages(prevMessages => [...prevMessages, newMessage]);
   };
 
   const handleGroupChange = (groupId: string) => {
     setSelectedGroup(groupId);
+    // When switching groups, you could load different messages here
+    // For now, we'll keep the same messages for all groups
   };
 
   if (!user) {
@@ -75,7 +96,7 @@ const Chat = () => {
         
         <div className="flex-1 overflow-hidden">
           <MessagesList 
-            messages={mockMessages}
+            messages={messages}
             loading={false}
             currentUserId={user.id}
           />
