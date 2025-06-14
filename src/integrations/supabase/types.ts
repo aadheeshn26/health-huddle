@@ -90,6 +90,36 @@ export type Database = {
         }
         Relationships: []
       }
+      reports: {
+        Row: {
+          created_at: string
+          doctor_email: string
+          id: string
+          report_url: string | null
+          status: string
+          time_range: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          doctor_email: string
+          id?: string
+          report_url?: string | null
+          status?: string
+          time_range: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          doctor_email?: string
+          id?: string
+          report_url?: string | null
+          status?: string
+          time_range?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       streaks: {
         Row: {
           id: string
@@ -156,6 +186,42 @@ export type Database = {
           text?: string | null
           user_id?: string
           voice_transcript?: string | null
+        }
+        Relationships: []
+      }
+      trends_analysis: {
+        Row: {
+          analysis_period: number
+          claude_patterns: Json | null
+          created_at: string
+          gpt_summary: string | null
+          id: string
+          key_metrics: Json | null
+          updated_at: string
+          user_id: string
+          vision_insights: Json | null
+        }
+        Insert: {
+          analysis_period?: number
+          claude_patterns?: Json | null
+          created_at?: string
+          gpt_summary?: string | null
+          id?: string
+          key_metrics?: Json | null
+          updated_at?: string
+          user_id: string
+          vision_insights?: Json | null
+        }
+        Update: {
+          analysis_period?: number
+          claude_patterns?: Json | null
+          created_at?: string
+          gpt_summary?: string | null
+          id?: string
+          key_metrics?: Json | null
+          updated_at?: string
+          user_id?: string
+          vision_insights?: Json | null
         }
         Relationships: []
       }
