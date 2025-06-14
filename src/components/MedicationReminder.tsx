@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -13,6 +14,7 @@ interface Medication {
   name: string;
   time: string;
   frequency: string;
+  dayOfWeek?: number; // 0 = Sunday, 1 = Monday, etc.
   notifications: boolean;
 }
 
@@ -22,6 +24,7 @@ const MedicationReminder = () => {
   const [medication, setMedication] = useState('');
   const [time, setTime] = useState('');
   const [frequency, setFrequency] = useState('');
+  const [dayOfWeek, setDayOfWeek] = useState<number | undefined>(undefined);
   const [notifications, setNotifications] = useState(false);
   const [medications, setMedications] = useState<Medication[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
@@ -34,10 +37,20 @@ const MedicationReminder = () => {
     { value: 'monthly', label: 'Monthly' },
   ];
 
+  const dayOptions = [
+    { value: 0, label: 'Sunday' },
+    { value: 1, label: 'Monday' },
+    { value: 2, label: 'Tuesday' },
+    { value: 3, label: 'Wednesday' },
+    { value: 4, label: 'Thursday' },
+    { value: 5, label: 'Friday' },
+    { value: 6, label: 'Saturday' },
+  ];
+
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
     
-    console.log('Saving medication:', { medication, time, frequency, notifications });
+    console.log('Saving medication:', { medication, time, frequency, dayOfWeek, notifications });
     
     if (!medication.trim() || !time || !frequency) {
       toast({
@@ -48,11 +61,22 @@ const MedicationReminder = () => {
       return;
     }
 
+    // Validate day of week for weekly and bi-weekly frequencies
+    if ((frequency === 'weekly' || frequency === 'bi-weekly') && dayOfWeek === undefined) {
+      toast({
+        title: "Day of week required",
+        description: "Please select a day of the week for weekly or bi-weekly medications.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const newMedication: Medication = {
       id: Date.now().toString(),
       name: medication,
       time: time,
       frequency: frequency,
+      dayOfWeek: (frequency === 'weekly' || frequency === 'bi-weekly') ? dayOfWeek : undefined,
       notifications: notifications
     };
 
@@ -62,11 +86,15 @@ const MedicationReminder = () => {
     setMedication('');
     setTime('');
     setFrequency('');
+    setDayOfWeek(undefined);
     setNotifications(false);
+    
+    const dayName = dayOfWeek !== undefined ? dayOptions.find(d => d.value === dayOfWeek)?.label : '';
+    const frequencyText = dayName ? `${frequency} on ${dayName}` : frequency;
     
     toast({
       title: "Reminder added!",
-      description: `${medication} reminder set for ${time} (${frequency})`,
+      description: `${medication} reminder set for ${time} (${frequencyText})`,
     });
   };
 
@@ -76,6 +104,7 @@ const MedicationReminder = () => {
       setMedication(med.name);
       setTime(med.time);
       setFrequency(med.frequency);
+      setDayOfWeek(med.dayOfWeek);
       setNotifications(med.notifications);
       
       setMedications(prev => prev.filter(m => m.id !== id));
@@ -92,8 +121,8 @@ const MedicationReminder = () => {
 
   // Get medications for selected date based on frequency
   const getMedicationsForDate = () => {
+    const selectedDay = selectedDate.getDay(); // 0 = Sunday, 1 = Monday, etc.
     const today = new Date();
-    const selectedDay = selectedDate.getDay();
     const selectedDateNum = selectedDate.getDate();
     
     return medications.filter(med => {
@@ -101,10 +130,12 @@ const MedicationReminder = () => {
         case 'daily':
           return true;
         case 'weekly':
-          return selectedDay === today.getDay();
+          return med.dayOfWeek === selectedDay;
         case 'bi-weekly':
-          const weeksDiff = Math.floor((selectedDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24 * 7));
-          return weeksDiff % 2 === 0 && selectedDay === today.getDay();
+          // Calculate if the selected date falls on the correct bi-weekly cycle
+          const daysDiff = Math.floor((selectedDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+          const weeksDiff = Math.floor(daysDiff / 7);
+          return med.dayOfWeek === selectedDay && weeksDiff % 2 === 0;
         case 'monthly':
           return selectedDateNum === today.getDate();
         default:
@@ -117,6 +148,9 @@ const MedicationReminder = () => {
 
   console.log('Current medications:', medications);
   console.log('Selected date:', selectedDate);
+  console.log('Medications for selected date:', dateMedications);
+
+  const needsDaySelection = frequency === 'weekly' || frequency === 'bi-weekly';
 
   return (
     <div className="w-full">
@@ -161,7 +195,12 @@ const MedicationReminder = () => {
                   <label htmlFor="frequency" className="block text-sm font-medium text-slate-700 mb-2">
                     Frequency
                   </label>
-                  <Select value={frequency} onValueChange={setFrequency}>
+                  <Select value={frequency} onValueChange={(value) => {
+                    setFrequency(value);
+                    if (value !== 'weekly' && value !== 'bi-weekly') {
+                      setDayOfWeek(undefined);
+                    }
+                  }}>
                     <SelectTrigger className="bg-white/50 border-health-primary/30 text-slate-800 focus:border-health-primary focus:ring-health-primary">
                       <SelectValue placeholder="Select frequency..." />
                     </SelectTrigger>
@@ -174,6 +213,26 @@ const MedicationReminder = () => {
                     </SelectContent>
                   </Select>
                 </div>
+
+                {needsDaySelection && (
+                  <div>
+                    <label htmlFor="dayOfWeek" className="block text-sm font-medium text-slate-700 mb-2">
+                      Day of Week
+                    </label>
+                    <Select value={dayOfWeek?.toString()} onValueChange={(value) => setDayOfWeek(parseInt(value))}>
+                      <SelectTrigger className="bg-white/50 border-health-primary/30 text-slate-800 focus:border-health-primary focus:ring-health-primary">
+                        <SelectValue placeholder="Select day..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {dayOptions.map((option) => (
+                          <SelectItem key={option.value} value={option.value.toString()}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
 
                 <div className="flex items-center justify-between">
                   <label htmlFor="notifications" className="text-sm font-medium text-slate-700">
@@ -249,6 +308,7 @@ const MedicationReminder = () => {
                               </div>
                               <div className="text-sm text-health-muted">
                                 Frequency: {frequencyOptions.find(f => f.value === med.frequency)?.label}
+                                {med.dayOfWeek !== undefined && ` on ${dayOptions.find(d => d.value === med.dayOfWeek)?.label}`}
                               </div>
                               <div className="text-xs text-health-muted mt-1">
                                 Notifications: {med.notifications ? 'Enabled' : 'Disabled'}
@@ -287,6 +347,33 @@ const MedicationReminder = () => {
                 </div>
               </div>
             </div>
+
+            {/* Medications for Selected Date */}
+            {dateMedications.length > 0 && (
+              <div>
+                <h3 className="text-lg font-medium text-slate-800 mb-3">
+                  Medications for {format(selectedDate, 'MMMM d, yyyy')}
+                </h3>
+                <div className="bg-white rounded-lg border border-health-primary/20 p-4 shadow-sm">
+                  <div className="space-y-3">
+                    {dateMedications.map((med) => (
+                      <div key={med.id} className="bg-health-accent/20 rounded-lg p-3 border border-health-primary/20">
+                        <div className="flex justify-between items-center">
+                          <div>
+                            <div className="font-medium text-slate-800">{med.name}</div>
+                            <div className="text-sm text-health-muted">Take at {med.time}</div>
+                          </div>
+                          <div className="text-sm text-health-secondary font-medium">
+                            {frequencyOptions.find(f => f.value === med.frequency)?.label}
+                            {med.dayOfWeek !== undefined && ` - ${dayOptions.find(d => d.value === med.dayOfWeek)?.label}`}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </Card>
