@@ -65,7 +65,7 @@ const DailyCheckIn = () => {
     const averageScore = (totalScore / questions.length).toFixed(1);
     
     return (
-      <div className="bg-white/60 backdrop-blur-sm rounded-lg p-4 health-card-glow border border-health-primary/20 h-full flex flex-col justify-center">
+      <div className="bg-white/60 backdrop-blur-sm rounded-lg p-4 health-card-glow border border-health-primary/20 h-32 flex flex-col justify-center">
         <div className="flex items-center justify-center space-x-2 mb-2">
           <CheckCircle className="text-health-success" size={20} />
           <span className="text-2xl font-bold text-health-primary">{averageScore}</span>
@@ -91,7 +91,7 @@ const DailyCheckIn = () => {
 
   if (isCheckingIn) {
     return (
-      <Card className="p-4 bg-white/60 backdrop-blur-sm border-health-primary/20 health-card-glow h-full flex flex-col">
+      <Card className="p-4 bg-white/60 backdrop-blur-sm border-health-primary/20 health-card-glow h-32 flex flex-col">
         <div className="mb-4">
           <div className="text-xs text-health-muted mb-2">
             Question {currentQuestion + 1} of {questions.length}
@@ -116,7 +116,7 @@ const DailyCheckIn = () => {
   }
 
   return (
-    <div className="bg-white/60 backdrop-blur-sm rounded-lg p-4 health-card-glow border border-health-primary/20 h-full flex flex-col justify-center">
+    <div className="bg-white/60 backdrop-blur-sm rounded-lg p-4 health-card-glow border border-health-primary/20 h-32 flex flex-col justify-center">
       <div className="text-center mb-3">
         <div className="text-sm font-semibold text-slate-800 mb-1">
           Daily Check-in
