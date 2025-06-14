@@ -1,17 +1,22 @@
+
 import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 
 const SymptomForm = () => {
+  const { user } = useAuth();
   const [symptoms, setSymptoms] = useState('');
   const [isRecording, setIsRecording] = useState(false);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!symptoms.trim() && !selectedImage) {
@@ -23,18 +28,70 @@ const SymptomForm = () => {
       return;
     }
 
-    console.log('Submitting symptoms:', { symptoms, image: selectedImage?.name });
-    
-    toast({
-      title: "Symptoms recorded!",
-      description: "Your symptoms have been saved successfully.",
-    });
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please log in to save your symptoms.",
+        variant: "destructive",
+      });
+      return;
+    }
 
-    // Reset form
-    setSymptoms('');
-    setSelectedImage(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+    setIsSubmitting(true);
+
+    try {
+      // Determine the type of checkup
+      let checkupType = 'text';
+      if (selectedImage) checkupType = 'image';
+      if (symptoms.includes('Voice recording:')) checkupType = 'voice';
+
+      // Save symptom to symptoms table
+      const { error: symptomError } = await supabase
+        .from('symptoms')
+        .insert({
+          user_id: user.id,
+          text: symptoms,
+          image_url: selectedImage ? `image_${Date.now()}_${selectedImage.name}` : null,
+        });
+
+      if (symptomError) throw symptomError;
+
+      // Record daily checkup (this will trigger streak update)
+      const { error: checkupError } = await supabase
+        .from('daily_checkups')
+        .insert({
+          user_id: user.id,
+          type: checkupType,
+        });
+
+      if (checkupError) throw checkupError;
+
+      console.log('Symptoms and daily checkup recorded:', { symptoms, image: selectedImage?.name, type: checkupType });
+      
+      toast({
+        title: "Symptoms recorded!",
+        description: "Your symptoms have been saved and streak updated.",
+      });
+
+      // Reset form
+      setSymptoms('');
+      setSelectedImage(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+
+      // Refresh the page to update streak counter
+      window.location.reload();
+
+    } catch (error) {
+      console.error('Error saving symptoms:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save symptoms. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -134,9 +191,10 @@ const SymptomForm = () => {
 
         <Button
           type="submit"
+          disabled={isSubmitting}
           className="w-full bg-health-primary hover:bg-health-secondary text-white font-semibold py-3"
         >
-          Save Symptoms
+          {isSubmitting ? 'Saving...' : 'Save Symptoms'}
         </Button>
       </form>
     </Card>

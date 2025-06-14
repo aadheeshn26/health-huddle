@@ -72,7 +72,9 @@ export default {
 				'health-lighter': '#f8fafc', // Slate-50
 				'health-success': '#10b981', // Emerald-500
 				'health-warning': '#f59e0b', // Amber-500
-				'health-info': '#3b82f6' // Blue-500
+				'health-info': '#3b82f6', // Blue-500
+				'health-dark': '#1e293b', // Slate-800
+				'health-darker': '#0f172a', // Slate-900
 			},
 			borderRadius: {
 				lg: 'var(--radius)',

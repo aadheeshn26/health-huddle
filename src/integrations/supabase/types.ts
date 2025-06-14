@@ -12,23 +12,56 @@ export type Database = {
       chat_messages: {
         Row: {
           created_at: string
+          flagged_reason: string | null
           group_id: string | null
           id: string
+          is_flagged: boolean | null
           message: string
+          moderated_at: string | null
           user_id: string
         }
         Insert: {
           created_at?: string
+          flagged_reason?: string | null
           group_id?: string | null
           id?: string
+          is_flagged?: boolean | null
           message: string
+          moderated_at?: string | null
           user_id: string
         }
         Update: {
           created_at?: string
+          flagged_reason?: string | null
           group_id?: string | null
           id?: string
+          is_flagged?: boolean | null
           message?: string
+          moderated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      daily_checkups: {
+        Row: {
+          completed_at: string
+          created_at: string
+          id: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string
+          created_at?: string
+          id?: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string
+          created_at?: string
+          id?: string
+          type?: string
           user_id?: string
         }
         Relationships: []
@@ -131,7 +164,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      calculate_user_streak: {
+        Args: { user_uuid: string }
+        Returns: number
+      }
     }
     Enums: {
       health_condition:

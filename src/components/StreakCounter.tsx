@@ -1,53 +1,67 @@
+
 import { useState, useEffect } from 'react';
-import { Flame } from 'lucide-react';
+import { Flame, Award } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 
 const StreakCounter = () => {
+  const { user } = useAuth();
   const [streak, setStreak] = useState(0);
-  const [lastLoginDate, setLastLoginDate] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Get streak data from localStorage (simulating backend for now)
-    const storedStreak = localStorage.getItem('healthhuddle_streak');
-    const storedLastLogin = localStorage.getItem('healthhuddle_last_login');
-    const today = new Date().toDateString();
+    if (!user) return;
 
-    console.log('Loading streak data:', { storedStreak, storedLastLogin, today });
+    const fetchStreak = async () => {
+      try {
+        // First try to get streak from database
+        const { data: streakData } = await supabase
+          .from('streaks')
+          .select('streak_count')
+          .eq('user_id', user.id)
+          .single();
 
-    if (storedLastLogin === today) {
-      // Already logged in today
-      setStreak(parseInt(storedStreak || '1'));
-      setLastLoginDate(storedLastLogin);
-    } else if (storedLastLogin) {
-      const lastLogin = new Date(storedLastLogin);
-      const todayDate = new Date();
-      const diffTime = Math.abs(todayDate.getTime() - lastLogin.getTime());
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-      if (diffDays === 1) {
-        // Consecutive day - increment streak
-        const newStreak = parseInt(storedStreak || '0') + 1;
-        setStreak(newStreak);
-        localStorage.setItem('healthhuddle_streak', newStreak.toString());
-        localStorage.setItem('healthhuddle_last_login', today);
-        setLastLoginDate(today);
-        console.log('Streak incremented to:', newStreak);
-      } else {
-        // Missed days - reset streak
-        setStreak(1);
-        localStorage.setItem('healthhuddle_streak', '1');
-        localStorage.setItem('healthhuddle_last_login', today);
-        setLastLoginDate(today);
-        console.log('Streak reset to 1');
+        if (streakData) {
+          setStreak(streakData.streak_count);
+        } else {
+          // Calculate streak using the database function
+          const { data: calculatedStreak } = await supabase
+            .rpc('calculate_user_streak', { user_uuid: user.id });
+          
+          setStreak(calculatedStreak || 0);
+        }
+      } catch (error) {
+        console.error('Error fetching streak:', error);
+        setStreak(0);
+      } finally {
+        setLoading(false);
       }
-    } else {
-      // First time user
-      setStreak(1);
-      localStorage.setItem('healthhuddle_streak', '1');
-      localStorage.setItem('healthhuddle_last_login', today);
-      setLastLoginDate(today);
-      console.log('First time login, streak set to 1');
-    }
-  }, []);
+    };
+
+    fetchStreak();
+  }, [user]);
+
+  const getBadgeInfo = () => {
+    if (streak >= 30) return { text: '30-Day Champion', color: 'text-yellow-400', icon: Award };
+    if (streak >= 14) return { text: '14-Day Warrior', color: 'text-purple-400', icon: Award };
+    if (streak >= 7) return { text: '7-Day Hero', color: 'text-blue-400', icon: Award };
+    if (streak >= 5) return { text: '5-Day Supporter', color: 'text-green-400', icon: Award };
+    return null;
+  };
+
+  const badgeInfo = getBadgeInfo();
+
+  if (loading) {
+    return (
+      <div className="text-center">
+        <div className="animate-pulse">
+          <div className="h-6 w-6 bg-gray-300 rounded mx-auto mb-2"></div>
+          <div className="h-4 w-16 bg-gray-300 rounded mx-auto mb-1"></div>
+          <div className="h-3 w-12 bg-gray-300 rounded mx-auto"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="text-center">
@@ -56,12 +70,23 @@ const StreakCounter = () => {
         <span className="text-xl font-bold text-health-primary">{streak}</span>
       </div>
       <div className="text-xs font-semibold text-slate-800 mb-1">
-        Day Streak
+        {streak === 1 ? 'Day Streak' : 'Day Streak'}
       </div>
-      <div className="text-xs text-health-muted">
-        Keep it up!
-      </div>
-      <div className="mt-2 flex justify-center">
+      
+      {badgeInfo ? (
+        <div className="flex items-center justify-center space-x-1 mb-2">
+          <badgeInfo.icon className={badgeInfo.color} size={12} />
+          <span className={`text-xs font-bold ${badgeInfo.color}`}>
+            {badgeInfo.text}
+          </span>
+        </div>
+      ) : (
+        <div className="text-xs text-health-muted mb-2">
+          Keep it up!
+        </div>
+      )}
+      
+      <div className="flex justify-center">
         <div className="flex space-x-1">
           {[...Array(Math.min(streak, 3))].map((_, i) => (
             <div
