@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import Navigation from '@/components/Navigation';
 import { useAuth } from '@/hooks/useAuth';
@@ -13,20 +14,9 @@ interface Message {
   user_email?: string;
 }
 
-const Chat = () => {
-  const { user } = useAuth();
-  const [selectedGroup, setSelectedGroup] = useState('general');
-
-  const groups = [
-    { id: 'general', name: 'General Support', members: 234 },
-    { id: 'diabetes', name: 'Diabetes Care', members: 89 },
-    { id: 'anxiety', name: 'Anxiety Support', members: 156 },
-    { id: 'arthritis', name: 'Arthritis Care', members: 73 },
-    { id: 'hypertension', name: 'Heart Health', members: 45 },
-  ];
-
-  // Initial mock messages
-  const initialMessages: Message[] = [
+// Define separate message histories for each group
+const initialGroupMessages: Record<string, Message[]> = {
+  general: [
     {
       id: '1',
       user_id: 'other-user-1',
@@ -36,24 +26,65 @@ const Chat = () => {
     },
     {
       id: '2',
-      user_id: user?.id || 'dev-user-123',
+      user_id: 'dev-user-123',
       message: 'Hi Sarah! I\'m doing well, thanks for asking.',
       created_at: new Date(Date.now() - 1800000).toISOString(),
-      user_email: user?.email
-    },
+      user_email: 'dev@example.com'
+    }
+  ],
+  diabetes: [
     {
       id: '3',
-      user_id: 'other-user-2',
-      message: 'Great to see everyone here supporting each other!',
-      created_at: new Date(Date.now() - 900000).toISOString(),
+      user_id: 'other-user-3',
+      message: 'Anyone have tips for managing blood sugar levels?',
+      created_at: new Date(Date.now() - 2400000).toISOString(),
+      user_email: 'john@example.com'
+    }
+  ],
+  anxiety: [
+    {
+      id: '4',
+      user_id: 'other-user-4',
+      message: 'Breathing exercises have really helped me lately.',
+      created_at: new Date(Date.now() - 1200000).toISOString(),
+      user_email: 'emma@example.com'
+    }
+  ],
+  arthritis: [
+    {
+      id: '5',
+      user_id: 'other-user-5',
+      message: 'What exercises work best for joint pain?',
+      created_at: new Date(Date.now() - 3000000).toISOString(),
       user_email: 'mike@example.com'
     }
+  ],
+  hypertension: [
+    {
+      id: '6',
+      user_id: 'other-user-6',
+      message: 'Diet changes have made a huge difference for me.',
+      created_at: new Date(Date.now() - 1500000).toISOString(),
+      user_email: 'lisa@example.com'
+    }
+  ]
+};
+
+const Chat = () => {
+  const { user } = useAuth();
+  const [selectedGroup, setSelectedGroup] = useState('general');
+  const [groupMessages, setGroupMessages] = useState<Record<string, Message[]>>(initialGroupMessages);
+
+  const groups = [
+    { id: 'general', name: 'General Support', members: 234 },
+    { id: 'diabetes', name: 'Diabetes Care', members: 89 },
+    { id: 'anxiety', name: 'Anxiety Support', members: 156 },
+    { id: 'arthritis', name: 'Arthritis Care', members: 73 },
+    { id: 'hypertension', name: 'Heart Health', members: 45 },
   ];
 
-  const [messages, setMessages] = useState<Message[]>(initialMessages);
-
   const sendMessage = async (message: string) => {
-    console.log('Sending message:', message);
+    console.log('Sending message to group:', selectedGroup, message);
     
     // Create new message object
     const newMessage: Message = {
@@ -64,14 +95,24 @@ const Chat = () => {
       user_email: user?.email
     };
 
-    // Add message to local state
-    setMessages(prevMessages => [...prevMessages, newMessage]);
+    // Add message to the current group's chat history
+    setGroupMessages(prev => ({
+      ...prev,
+      [selectedGroup]: [...(prev[selectedGroup] || []), newMessage]
+    }));
   };
 
   const handleGroupChange = (groupId: string) => {
+    console.log('Switching to group:', groupId);
     setSelectedGroup(groupId);
-    // When switching groups, you could load different messages here
-    // For now, we'll keep the same messages for all groups
+    
+    // Initialize empty message array for new groups if they don't exist
+    if (!groupMessages[groupId]) {
+      setGroupMessages(prev => ({
+        ...prev,
+        [groupId]: []
+      }));
+    }
   };
 
   if (!user) {
@@ -85,6 +126,9 @@ const Chat = () => {
     );
   }
 
+  // Get messages for the currently selected group
+  const currentMessages = groupMessages[selectedGroup] || [];
+
   return (
     <div className="min-h-screen bg-black text-white pb-20">
       <div className="max-w-4xl mx-auto h-screen flex flex-col">
@@ -96,7 +140,7 @@ const Chat = () => {
         
         <div className="flex-1 overflow-hidden">
           <MessagesList 
-            messages={messages}
+            messages={currentMessages}
             loading={false}
             currentUserId={user.id}
           />
