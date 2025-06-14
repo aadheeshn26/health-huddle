@@ -1,3 +1,4 @@
+
 import { useState, useRef, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -6,12 +7,12 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useAudioRecorder } from '@/hooks/useAudioRecorder';
-import { Mic, MicOff, Loader2 } from 'lucide-react';
+import { useImageUpload } from '@/hooks/useImageUpload';
+import { Mic, MicOff, Loader2, Upload, X } from 'lucide-react';
 
 const SymptomForm = () => {
   const { user } = useAuth();
   const [symptoms, setSymptoms] = useState('');
-  const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
@@ -25,6 +26,7 @@ const SymptomForm = () => {
   }, []);
 
   const { isRecording, isTranscribing, toggleRecording } = useAudioRecorder(handleTranscription);
+  const { selectedImage, imagePreview, isProcessing, handleImageUpload, clearImage } = useImageUpload();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -85,7 +87,7 @@ const SymptomForm = () => {
 
       // Reset form
       setSymptoms('');
-      setSelectedImage(null);
+      clearImage();
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
@@ -105,28 +107,10 @@ const SymptomForm = () => {
     }
   };
 
-  const handleVoiceTranscription = async () => {
-    if (isRecording || isTranscribing) {
-      // If recording, stop it
-      toggleRecording();
-      return;
-    }
-
-    // Start recording and handle the result
-    toggleRecording();
-    
-    // Note: The actual transcription will be handled by the useAudioRecorder hook
-    // We'll need to modify the hook to return the transcribed text
-  };
-
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setSelectedImage(file);
-      toast({
-        title: "Image uploaded",
-        description: `${file.name} has been attached.`,
-      });
+      handleImageUpload(file);
     }
   };
 
@@ -214,23 +198,55 @@ const SymptomForm = () => {
             type="button"
             onClick={() => fileInputRef.current?.click()}
             variant="outline"
+            disabled={isProcessing}
             className="flex-1 bg-transparent border-health-primary text-health-primary hover:bg-health-primary/10"
           >
-            📷 Upload Image
+            {isProcessing ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Processing...
+              </>
+            ) : (
+              <>
+                <Upload className="w-4 h-4 mr-2" />
+                Upload Medical Data
+              </>
+            )}
           </Button>
           
           <input
             ref={fileInputRef}
             type="file"
             accept="image/*"
-            onChange={handleImageUpload}
+            onChange={handleFileSelect}
             className="hidden"
           />
         </div>
 
-        {selectedImage && (
-          <div className="text-sm text-health-secondary">
-            📎 Attached: {selectedImage.name}
+        {imagePreview && (
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-medium text-slate-700">Uploaded Medical Data:</p>
+              <Button
+                type="button"
+                onClick={clearImage}
+                variant="ghost"
+                size="sm"
+                className="h-6 w-6 p-0 text-slate-500 hover:text-red-500"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+            <div className="relative">
+              <img
+                src={imagePreview}
+                alt="Medical data preview"
+                className="max-h-48 w-auto rounded-lg border border-slate-200 shadow-sm"
+              />
+              <div className="mt-2 text-xs text-slate-600">
+                📎 {selectedImage?.name} ({Math.round((selectedImage?.size || 0) / 1024)}KB)
+              </div>
+            </div>
           </div>
         )}
 
