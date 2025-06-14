@@ -15,7 +15,9 @@ interface Medication {
   time: string;
   frequency: string;
   dayOfWeek?: number; // 0 = Sunday, 1 = Monday, etc.
+  dayOfMonth?: number; // 1-31 for monthly medications
   notifications: boolean;
+  createdDate?: Date; // Track when medication was created for bi-weekly calculation
 }
 
 const MedicationReminder = () => {
@@ -25,6 +27,7 @@ const MedicationReminder = () => {
   const [time, setTime] = useState('');
   const [frequency, setFrequency] = useState('');
   const [dayOfWeek, setDayOfWeek] = useState<number | undefined>(undefined);
+  const [dayOfMonth, setDayOfMonth] = useState<number | undefined>(undefined);
   const [notifications, setNotifications] = useState(false);
   const [medications, setMedications] = useState<Medication[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
@@ -47,10 +50,16 @@ const MedicationReminder = () => {
     { value: 6, label: 'Saturday' },
   ];
 
+  // Generate array of day numbers 1-31
+  const dayOfMonthOptions = Array.from({ length: 31 }, (_, i) => ({
+    value: i + 1,
+    label: (i + 1).toString()
+  }));
+
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
     
-    console.log('Saving medication:', { medication, time, frequency, dayOfWeek, notifications });
+    console.log('Saving medication:', { medication, time, frequency, dayOfWeek, dayOfMonth, notifications });
     
     if (!medication.trim() || !time || !frequency) {
       toast({
@@ -71,13 +80,25 @@ const MedicationReminder = () => {
       return;
     }
 
+    // Validate day of month for monthly frequency
+    if (frequency === 'monthly' && dayOfMonth === undefined) {
+      toast({
+        title: "Day of month required",
+        description: "Please select a day of the month for monthly medications.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const newMedication: Medication = {
       id: Date.now().toString(),
       name: medication,
       time: time,
       frequency: frequency,
       dayOfWeek: (frequency === 'weekly' || frequency === 'bi-weekly') ? dayOfWeek : undefined,
-      notifications: notifications
+      dayOfMonth: frequency === 'monthly' ? dayOfMonth : undefined,
+      notifications: notifications,
+      createdDate: new Date()
     };
 
     setMedications(prev => [...prev, newMedication]);
@@ -87,10 +108,17 @@ const MedicationReminder = () => {
     setTime('');
     setFrequency('');
     setDayOfWeek(undefined);
+    setDayOfMonth(undefined);
     setNotifications(false);
     
-    const dayName = dayOfWeek !== undefined ? dayOptions.find(d => d.value === dayOfWeek)?.label : '';
-    const frequencyText = dayName ? `${frequency} on ${dayName}` : frequency;
+    let frequencyText = frequency;
+    if (dayOfWeek !== undefined) {
+      const dayName = dayOptions.find(d => d.value === dayOfWeek)?.label;
+      frequencyText = `${frequency} on ${dayName}`;
+    }
+    if (dayOfMonth !== undefined) {
+      frequencyText = `${frequency} on day ${dayOfMonth}`;
+    }
     
     toast({
       title: "Reminder added!",
@@ -105,6 +133,7 @@ const MedicationReminder = () => {
       setTime(med.time);
       setFrequency(med.frequency);
       setDayOfWeek(med.dayOfWeek);
+      setDayOfMonth(med.dayOfMonth);
       setNotifications(med.notifications);
       
       setMedications(prev => prev.filter(m => m.id !== id));
@@ -122,29 +151,48 @@ const MedicationReminder = () => {
   // Get medications for selected date based on frequency
   const getMedicationsForDate = () => {
     const selectedDay = selectedDate.getDay(); // 0 = Sunday, 1 = Monday, etc.
-    const today = new Date();
+    const selectedDateNum = selectedDate.getDate(); // 1-31
+    
+    console.log('Filtering medications for date:', selectedDate);
+    console.log('Selected day of week:', selectedDay);
+    console.log('Selected day of month:', selectedDateNum);
     
     return medications.filter(med => {
+      console.log('Checking medication:', med.name, 'frequency:', med.frequency);
+      
       switch (med.frequency) {
         case 'daily':
+          console.log('Daily medication - showing');
           return true;
+          
         case 'weekly':
-          // Only show if the selected date's day of week matches the medication's day
-          return med.dayOfWeek === selectedDay;
+          const weeklyMatch = med.dayOfWeek === selectedDay;
+          console.log('Weekly medication - dayOfWeek:', med.dayOfWeek, 'selectedDay:', selectedDay, 'match:', weeklyMatch);
+          return weeklyMatch;
+          
         case 'bi-weekly':
-          // For bi-weekly, check if it's the right day AND the right week cycle
+          // First check if it's the right day of week
           if (med.dayOfWeek !== selectedDay) {
+            console.log('Bi-weekly medication - wrong day of week');
             return false;
           }
-          // Calculate weeks difference from today
-          const timeDiff = selectedDate.getTime() - today.getTime();
+          
+          // Calculate weeks difference from creation date
+          const createdDate = med.createdDate || new Date();
+          const timeDiff = selectedDate.getTime() - createdDate.getTime();
           const daysDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
           const weeksDiff = Math.floor(daysDiff / 7);
-          return weeksDiff % 2 === 0;
+          const biWeeklyMatch = weeksDiff % 2 === 0;
+          console.log('Bi-weekly medication - weeks diff:', weeksDiff, 'match:', biWeeklyMatch);
+          return biWeeklyMatch;
+          
         case 'monthly':
-          // For monthly, check if it's the same day of the month as today
-          return selectedDate.getDate() === today.getDate();
+          const monthlyMatch = med.dayOfMonth === selectedDateNum;
+          console.log('Monthly medication - dayOfMonth:', med.dayOfMonth, 'selectedDateNum:', selectedDateNum, 'match:', monthlyMatch);
+          return monthlyMatch;
+          
         default:
+          console.log('Unknown frequency - not showing');
           return false;
       }
     });
@@ -157,6 +205,7 @@ const MedicationReminder = () => {
   console.log('Medications for selected date:', dateMedications);
 
   const needsDaySelection = frequency === 'weekly' || frequency === 'bi-weekly';
+  const needsMonthDaySelection = frequency === 'monthly';
 
   return (
     <div className="w-full">
@@ -206,6 +255,9 @@ const MedicationReminder = () => {
                     if (value !== 'weekly' && value !== 'bi-weekly') {
                       setDayOfWeek(undefined);
                     }
+                    if (value !== 'monthly') {
+                      setDayOfMonth(undefined);
+                    }
                   }}>
                     <SelectTrigger className="bg-white/50 border-health-primary/30 text-slate-800 focus:border-health-primary focus:ring-health-primary">
                       <SelectValue placeholder="Select frequency..." />
@@ -231,6 +283,26 @@ const MedicationReminder = () => {
                       </SelectTrigger>
                       <SelectContent>
                         {dayOptions.map((option) => (
+                          <SelectItem key={option.value} value={option.value.toString()}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+
+                {needsMonthDaySelection && (
+                  <div>
+                    <label htmlFor="dayOfMonth" className="block text-sm font-medium text-slate-700 mb-2">
+                      Day of Month
+                    </label>
+                    <Select value={dayOfMonth?.toString()} onValueChange={(value) => setDayOfMonth(parseInt(value))}>
+                      <SelectTrigger className="bg-white/50 border-health-primary/30 text-slate-800 focus:border-health-primary focus:ring-health-primary">
+                        <SelectValue placeholder="Select day (1-31)..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {dayOfMonthOptions.map((option) => (
                           <SelectItem key={option.value} value={option.value.toString()}>
                             {option.label}
                           </SelectItem>
@@ -315,6 +387,7 @@ const MedicationReminder = () => {
                               <div className="text-sm text-health-muted">
                                 Frequency: {frequencyOptions.find(f => f.value === med.frequency)?.label}
                                 {med.dayOfWeek !== undefined && ` on ${dayOptions.find(d => d.value === med.dayOfWeek)?.label}`}
+                                {med.dayOfMonth !== undefined && ` on day ${med.dayOfMonth}`}
                               </div>
                               <div className="text-xs text-health-muted mt-1">
                                 Notifications: {med.notifications ? 'Enabled' : 'Disabled'}
@@ -372,6 +445,7 @@ const MedicationReminder = () => {
                           <div className="text-sm text-health-secondary font-medium">
                             {frequencyOptions.find(f => f.value === med.frequency)?.label}
                             {med.dayOfWeek !== undefined && ` - ${dayOptions.find(d => d.value === med.dayOfWeek)?.label}`}
+                            {med.dayOfMonth !== undefined && ` - Day ${med.dayOfMonth}`}
                           </div>
                         </div>
                       </div>
